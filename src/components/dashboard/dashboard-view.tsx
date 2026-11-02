@@ -321,7 +321,8 @@ export function DashboardView(p: DashboardViewProps) {
   const hasAlerts = p.budgets.alerts.length > 0;
   const netApp = summary.netCents >= 0;
   return (
-    <>
+    // ordi : en-tête et contenu partagent la même largeur maximum (content-max + marges)
+    <div className="md:max-w-[calc(var(--content-max)+44px)]">
       <DashboardHeader
         title="Tableau de bord"
         monthLabel={p.monthLabel}
@@ -377,7 +378,7 @@ export function DashboardView(p: DashboardViewProps) {
       </div>
 
       {/* ——— Ordinateur ——— */}
-      <div className="flex max-w-content-max flex-col gap-5 pt-1 pr-6 pb-7 pl-5 max-md:hidden">
+      <div className="flex flex-col gap-5 pt-1 pr-6 pb-7 pl-5 max-md:hidden">
         {hasAlerts && <AlertsNote overs={p.overs} warns={p.warns} />}
         <div className="grid grid-cols-4 gap-4">
           <Kpi
@@ -410,6 +411,6 @@ export function DashboardView(p: DashboardViewProps) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
