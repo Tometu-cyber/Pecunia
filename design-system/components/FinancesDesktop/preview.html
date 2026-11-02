@@ -1,0 +1,156 @@
+<!-- @dsCard group="Écrans" height=900 width=1320 page subtitle="Pecunia : accueil sur Mac, refait avec le design system" -->
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Pecunia ordi</title>
+<style>
+body{margin:0;background:var(--bg-window);font-family:var(--font-sans);color:var(--label)}
+.desk{padding:20px;display:flex;justify-content:center}
+.win{position:relative;width:1280px;height:860px;border-radius:26px;overflow:hidden;background:var(--bg-grouped);box-shadow:var(--shadow-window)}
+.side{position:absolute;left:8px;top:8px;bottom:8px;z-index:30;display:flex}
+.side .pt-sidebar{height:100%}
+.main .pt-hdr-mac::before{background:color-mix(in srgb,var(--bg-grouped) 78%,transparent)}
+.main{position:absolute;inset:0;overflow:auto;padding-left:256px}
+.content{padding:4px 24px 28px 20px;display:flex;flex-direction:column;gap:20px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.kpi .k-l{display:flex;align-items:center;gap:8px;font-size:13px;line-height:18px;font-weight:600;color:var(--label-secondary)}
+.kpi .k-i{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--finances-bg);color:var(--finances-text)}
+.kpi .k-v{margin:10px 0 2px;font-family:var(--font-rounded);font-size:28px;line-height:34px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .k-v.is-app{color:var(--finances-text)}
+.kpi .k-s{font-size:13px;line-height:18px;color:var(--label-secondary)}
+.cols{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:20px;min-width:0}
+.pat{padding:10px 12px;border-radius:12px;background:var(--fill-tertiary)}
+.pat span{display:block;font-size:11px;line-height:14px;font-weight:600;color:var(--label-secondary)}
+.pat b{font-family:var(--font-rounded);font-size:20px;line-height:25px;font-weight:700;font-variant-numeric:tabular-nums}
+.who{display:flex;align-items:center;gap:8px;margin-top:10px;padding:0 4px;font-size:12px;line-height:15px;color:var(--label-secondary)}
+.who b{display:block;color:var(--label);font-size:13px}
+.fx-total{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;margin:-2px 0 10px}
+.fx-total b{font-family:var(--font-rounded);font-size:28px;line-height:34px;font-weight:700;color:var(--label);font-variant-numeric:tabular-nums}
+.fx-total b.is-app{color:var(--finances-text)}
+.fx-total span{font-size:13px;line-height:18px;font-weight:600;color:var(--finances-text)}
+.fx-total span.is-muted{font-weight:400;color:var(--label-secondary)}
+.fx-acc-val{display:inline-flex;align-items:center;gap:14px}
+.fx-bar-meta{display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:13px;line-height:18px;color:var(--label-secondary)}
+.fx-note{display:flex;gap:8px;align-items:flex-start;margin:14px 0 0;padding:10px 12px;border-radius:12px;background:var(--fill-tertiary);font-size:13px;line-height:18px;color:var(--label-secondary)}
+.fx-note svg{flex:none;margin-top:1px}
+.fx-stack{display:flex;gap:2px;height:14px;border-radius:7px;overflow:hidden;margin:4px 0 14px}
+.fx-legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.fx-legend li{display:flex;align-items:center;gap:10px;font-size:17px;line-height:22px;letter-spacing:-.43px}
+.fx-legend i{width:10px;height:10px;border-radius:50%;flex:none}
+.fx-legend .n{flex:1;min-width:0}
+.fx-legend .v{font-weight:600;font-variant-numeric:tabular-nums}
+.fx-legend .p{width:48px;text-align:right;color:var(--label-secondary);font-size:15px;font-variant-numeric:tabular-nums}
+.fx-seg{display:flex;margin:-4px 0 18px}
+.win .fx-seg{justify-content:flex-end;margin:-46px 0 26px}
+.fx-hero-label{font-size:15px;line-height:20px;font-weight:600;color:var(--label-secondary)}
+.fx-hero-val{margin:2px 0 0;font-family:var(--font-rounded);font-size:44px;line-height:50px;font-weight:700;color:var(--finances-text);font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.fx-trio{display:grid;grid-template-columns:repeat(3,1fr);margin-top:14px;padding-top:12px;border-top:.5px solid var(--separator)}
+.fx-trio span{display:block;font-size:13px;line-height:18px;color:var(--label-secondary)}
+.fx-trio b{font-family:var(--font-rounded);font-size:20px;line-height:25px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--label)}
+.fx-trio b.is-app{color:var(--finances-text)}
+.fx-month{display:flex;align-items:center;gap:8px}
+.fx-month .pt-btn{width:36px;padding:0;height:36px}
+.fx-month strong{font-size:20px;line-height:25px;font-weight:600;letter-spacing:-.45px;min-width:0}
+
+</style></head><body>
+<div class="desk"><div class="win">
+<div class="main" id="main"></div>
+<div class="side" id="side"></div>
+</div></div>
+<script>
+var P = window.Portail, h = React.createElement, fr = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function eur(v, sign) { return (sign && v > 0 ? '+' : v < 0 ? '−' : '') + fr.format(Math.abs(v)) + ' €'; }
+var D = {
+  month: 'Novembre 2026',
+  income: 1546.29, expense: 3.49, net: 1542.80, saved: 0, savingsRate: '99,8 %',
+  netWorth: 3554.30, netWorthDelta: '+3 494 € en 12 mois',
+  accounts: [
+    { id: 'cc', name: 'Compte courant', meta: 'Courant · dans le budget', icon: 'card', balance: 1542.10, color: 'var(--label)', series: [40, 38, 41, 39, 30, 31, 30, 29, 30, 31, 30, 95] },
+    { id: 'la', name: 'Livret A', meta: 'Épargne', icon: 'coins', balance: 2012.20, color: 'var(--finances)', series: [10, 12, 12, 30, 34, 52, 70, 58, 60, 56, 57, 57] }
+  ],
+  budget: { remaining: 1272.73, spent: 3.49, total: 1276.22, ratio: 0.003, note: 'Calculé sur Compte courant. Les virements sont exclus.' },
+  categories: [{ name: 'Abonnements', value: 3.49, share: 1, color: '#d6589c' }],
+  bars: [['Déc', 0], ['Janv', 1300], ['Févr', 1600], ['Mars', 1400], ['Avr', 2000], ['Mai', 2200], ['Juin', 3700], ['Juil', 4200], ['Août', 2500], ['Sept', 2900], ['Oct', 1600], ['Nov', 3.49]],
+  upcoming: [
+    { date: '5 nov.', label: 'Virement épargne', meta: 'Virement · Courant → Livret A', value: '200,00 €', icon: 'swap', tone: undefined },
+    { date: '10 nov.', label: 'Forfait mobile', meta: 'Abonnements · Courant', value: '−9,99 €', icon: 'calendar', tone: 'negative' },
+    { date: '28 nov.', label: 'Salaire alternance', meta: 'Revenus · Courant', value: '+1 120,00 €', icon: 'euro', tone: 'positive' }
+  ]
+};
+function spark(values, color) {
+  var w = 90, hh = 26, mx = Math.max.apply(null, values), mn = Math.min.apply(null, values);
+  var pts = values.map(function (v, i) { return (i / (values.length - 1) * w).toFixed(1) + ',' + (hh - 2 - (v - mn) / (mx - mn || 1) * (hh - 4)).toFixed(1); }).join(' ');
+  return h('svg', { width: w, height: hh, viewBox: '0 0 ' + w + ' ' + hh, 'aria-hidden': 'true', className: 'fx-spark' },
+    h('polyline', { points: pts, fill: 'none', style: { stroke: color }, strokeWidth: 1.75, strokeLinejoin: 'round', strokeLinecap: 'round' }));
+}
+function accountsCard(withSpark) {
+  return h(P.Card, { title: 'Mes comptes', app: 'finances', action: { label: 'Gérer' } },
+    h('div', { className: 'fx-total' }, h('b', null, eur(D.netWorth)), h('span', null, D.netWorthDelta)),
+    h(P.List, { plain: true, inset: true }, D.accounts.map(function (a) {
+      return h(P.ListRow, { key: a.id, app: 'finances', icon: a.icon, title: a.name, subtitle: a.meta, onClick: function () {}, chevron: false,
+        value: h('span', { className: 'fx-acc-val' }, withSpark ? spark(a.series, a.color) : null, eur(a.balance)), tone: 'strong' });
+    })));
+}
+function budgetCard() {
+  var b = D.budget;
+  return h(P.Card, { title: 'Budget global', app: 'finances', action: { label: 'Budgets' } },
+    h('div', { className: 'fx-total' }, h('b', { className: 'is-app' }, eur(b.remaining)), h('span', { className: 'is-muted' }, 'reste à dépenser')),
+    h('div', { className: 'pt-app-finances' }, h('div', { className: 'pt-tile-bar', role: 'progressbar', 'aria-valuenow': 0, 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-label': 'Budget utilisé' }, h('span', { style: { width: Math.max(1.5, b.ratio * 100) + '%' } }))),
+    h('div', { className: 'fx-bar-meta' }, h('span', null, eur(b.spent) + ' sur ' + eur(b.total) + ' · 0 %'), h('span', null, 'Alerte à 80 %')),
+    h('p', { className: 'fx-note' }, h(P.Icon, { name: 'swap', size: 15, strokeWidth: 2 }), b.note));
+}
+function splitCard() {
+  return h(P.Card, { title: 'Répartition des dépenses', subtitle: eur(D.expense) + ' ce mois-ci' },
+    h('div', { className: 'fx-stack', 'aria-hidden': 'true' }, D.categories.map(function (c) { return h('span', { key: c.name, style: { flex: c.share, background: c.color } }); })),
+    h('ul', { className: 'fx-legend' }, D.categories.map(function (c) {
+      return h('li', { key: c.name }, h('i', { style: { background: c.color } }), h('span', { className: 'n' }, c.name), h('span', { className: 'v' }, eur(c.value)), h('span', { className: 'p' }, Math.round(c.share * 100) + ' %'));
+    })));
+}
+function barsCard(props) {
+  var st = React.useState((props && props.def) || '12');
+  var data = D.bars.slice(st[0] === '6' ? 6 : 0).map(function (b) { return { label: b[0], value: b[1] }; });
+  return h(P.Card, { title: 'Dépenses mensuelles', app: 'finances' },
+    h('div', { className: 'fx-seg' }, h(P.SegmentedControl, { size: 'small', label: 'Période', value: st[0], onChange: st[1], items: [{ id: '6', label: '6 mois' }, { id: '12', label: '12 mois' }] })),
+    h(P.BarChart, { app: 'finances', data: data, highlight: data.length - 1, height: 150, title: 'Dépenses par mois, en euros',
+      format: function (v) { return v >= 1000 ? (Math.round(v / 100) / 10).toString().replace('.', ',') + ' k€' : eur(v); } }));
+}
+function upcomingList(header) {
+  return h(P.List, { header: header },
+    D.upcoming.map(function (u) {
+      return h(P.ListRow, { key: u.label, app: 'finances', icon: u.icon, title: u.label, subtitle: u.date + ' · ' + u.meta, value: u.value, tone: u.tone, onClick: function () {} });
+    }));
+}
+
+ReactDOM.createRoot(document.getElementById('side')).render(h(P.Sidebar, { defaultActive: 'home', label: 'Pecunia',
+  sections: [
+    { items: [{ id: 'portail', label: 'Portail', app: 'portail' }] },
+    { title: 'Pecunia', items: [
+      { id: 'home', label: 'Accueil', icon: 'home' }, { id: 'saisie', label: 'Saisie', icon: 'plus' },
+      { id: 'tx', label: 'Transactions', icon: 'filter' }, { id: 'comptes', label: 'Comptes', icon: 'card' },
+      { id: 'prev', label: 'Prévisionnel', icon: 'trend' }, { id: 'bud', label: 'Budgets', icon: 'euro' }] },
+    { title: 'Gestion', items: [
+      { id: 'cat', label: 'Catégories', icon: 'grid' }, { id: 'rec', label: 'Récurrences', icon: 'swap' },
+      { id: 'ana', label: 'Analyses', icon: 'chart' }, { id: 'set', label: 'Paramètres', icon: 'settings' }] }],
+  footer: h(React.Fragment, null,
+    h('div', { className: 'pat' }, h('span', null, 'Patrimoine'), h('b', null, eur(D.netWorth))),
+    h('div', { className: 'who' }, h(P.AppIcon, { app: 'finances', size: 28 }), h('div', null, h('b', null, 'Tom'), 'Pecunia 0.3.0'))) }));
+function Kpi(p) {
+  return h(P.Card, { className: 'kpi' },
+    h('div', { className: 'k-l' }, h('span', { className: 'k-i' }, h(P.Icon, { name: p.icon, size: 15, strokeWidth: 2 })), p.label),
+    h('div', { className: 'k-v' + (p.app ? ' is-app' : '') }, p.value),
+    h('div', { className: 'k-s' }, p.sub));
+}
+ReactDOM.createRoot(document.getElementById('main')).render(h(React.Fragment, null,
+  h(P.AppHeader, { platform: 'mac', app: 'finances', title: 'Tableau de bord', subtitle: D.month,
+    center: h(P.SegmentedControl, { size: 'small', label: 'Compte', items: [{ id: 'all', label: 'Tous' }, { id: 'cc', label: 'Courant' }, { id: 'la', label: 'Livret A' }] }),
+    actions: [{ icon: 'back', label: 'Mois précédent' }, { icon: 'chevron', label: 'Mois suivant' }, { icon: 'plus', children: 'Nouvelle saisie', prominent: true }] }),
+  h('div', { className: 'content' },
+    h('div', { className: 'kpis' },
+      h(Kpi, { icon: 'euro', label: 'Entrées', value: eur(D.income), sub: 'Revenus du mois' }),
+      h(Kpi, { icon: 'card', label: 'Sorties', value: eur(D.expense), sub: 'Hors virements internes' }),
+      h(Kpi, { icon: 'trend', label: 'Solde du mois', value: eur(D.net, true), sub: 'Taux d’épargne ' + D.savingsRate, app: true }),
+      h(Kpi, { icon: 'coins', label: 'Épargné ce mois-ci', value: eur(D.saved), sub: 'Virements vers l’épargne et intérêts' })),
+    h('div', { className: 'cols' },
+      h('div', { className: 'stack' }, accountsCard(true), h(barsCard)),
+      h('div', { className: 'stack' }, budgetCard(), upcomingList('À venir · 60 prochains jours'), splitCard())))
+));
+</script></body></html>
