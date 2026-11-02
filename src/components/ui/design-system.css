@@ -2,7 +2,9 @@
    Lit uniquement les variables de src/app/globals.css (tokens). Chargé dans la couche
    « components » de Tailwind : une classe utilitaire peut surcharger un composant. */
 
-/* Accent par app : une classe pt-app-<app> redéfinit --app, --app-text, --app-bg, --on-app */
+/* Accent par app : une classe pt-app-<app> redéfinit --app, --app-text, --app-bg, --on-app.
+   Sans classe sur un conteneur, les composants prennent le bleu du portail. */
+:root { --app: var(--tint); --app-text: var(--tint-text); --app-bg: var(--tint-bg); --on-app: #ffffff; }
 .pt-app-portail { --app: var(--tint); --app-text: var(--tint-text); --app-bg: var(--tint-bg); --on-app: #ffffff; }
 .pt-app-finances { --app: var(--finances); --app-text: var(--finances-text); --app-bg: var(--finances-bg); --on-app: var(--on-finances); }
 .pt-app-sport { --app: var(--sport); --app-text: var(--sport-text); --app-bg: var(--sport-bg); --on-app: var(--on-sport); }
@@ -582,3 +584,14 @@ a.pt-btn-gray { color: var(--label); }
    <app> y descend à environ 2:1 ; <app>-text garde 4,5:1 (règle du README, § 5). */
 .pt-tabbar-row[class*="pt-app-"]:not(.pt-app-portail) .pt-tab[aria-current="page"] { color: var(--app-text); }
 .pt-sidebar[class*="pt-app-"]:not(.pt-app-portail) .pt-side-item > .pt-icon { color: var(--app-text); }
+
+/* Cible tactile de 44 px sur mobile (hit-target) : les contrôles compacts (28 à 36 px de haut)
+   gardent leur taille visible, mais la zone qui réagit au doigt fait au moins 44 × 44 px. */
+@media (max-width: 767px) {
+  .pt-btn-small, .pt-gbtn-small, .pt-seg-item, .pt-date-btn, .pt-cal-nav { position: relative; }
+  .pt-btn-small::after, .pt-gbtn-small::after, .pt-seg-item::after, .pt-date-btn::after, .pt-cal-nav::after {
+    content: ""; position: absolute; left: 50%; top: 50%;
+    width: max(100%, var(--hit-target)); height: max(100%, var(--hit-target));
+    transform: translate(-50%, -50%);
+  }
+}

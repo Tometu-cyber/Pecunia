@@ -11,8 +11,12 @@ export type AppId = "finances" | "sport" | "alternance" | "alimentation" | "note
 /** Couleur d'accent de Pecunia */
 export const PECUNIA_APP: AppId = "finances";
 
-export function appClass(app: AppId | undefined): string {
-  return `pt-app-${app ?? "portail"}`;
+/**
+ * Classe de couleur d'app. Sans app, le composant hérite de la couleur de son conteneur
+ * (pt-app-finances sur tout le layout de Pecunia), et à défaut du bleu du portail.
+ */
+export function appClass(app: AppId | undefined): string | undefined {
+  return app ? `pt-app-${app}` : undefined;
 }
 
 /** Épaisseur de trait par défaut des pictogrammes, proche des SF Symbols. */
