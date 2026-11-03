@@ -465,7 +465,7 @@ input[type="month"]::-webkit-date-and-time-value {
   /* valeur à gauche comme dans les autres champs (Safari la centre), hauteur d'une ligne
      même vide */
   margin: 0;
-  min-height: 1.4em;
+  min-height: 1lh;
   text-align: left;
 }
 

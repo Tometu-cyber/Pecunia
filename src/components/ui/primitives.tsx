@@ -70,8 +70,12 @@ export function Label({ children, htmlFor }: { children: ReactNode; htmlFor?: st
   );
 }
 
-export const inputClass =
-  "block w-full min-h-11 rounded-[10px] border border-n-300 bg-surface px-3 text-[17px] text-text placeholder:text-n-500 focus:border-accent focus:outline-none md:min-h-9 md:text-sm aria-[invalid=true]:border-danger";
+export const inputClass = clsx(
+  "block w-full min-h-11 rounded-[10px] border border-n-300 bg-surface px-3 text-[17px] text-text placeholder:text-n-500 focus:border-accent focus:outline-none md:min-h-9 md:text-sm aria-[invalid=true]:border-danger",
+  // Champs date : sans apparence native, Safari iOS colle la valeur en haut. Marge verticale
+  // et interligne explicites pour la centrer (1 + 10 + 22 + 10 + 1 = 44 px ; 36 px sur ordi).
+  "[&[type=date]]:py-[10px] [&[type=date]]:leading-[22px] md:[&[type=date]]:py-[7px] md:[&[type=date]]:leading-5",
+);
 
 export function Input({ className, ...props }: ComponentProps<"input">) {
   return <input className={clsx(inputClass, className)} {...props} />;
