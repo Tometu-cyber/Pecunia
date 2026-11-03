@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { useState, useTransition } from "react";
 import { createCategory, moveCategory, setCategoryArchived, updateCategory } from "@/lib/data/actions";
 import { CATEGORY_ICONS, PALETTE } from "@/lib/domain/defaults";
@@ -78,11 +78,12 @@ export function CategoriesManager({
     <div className="flex flex-col gap-4">
       <div className="flex justify-end">
         <Button variant="primary" onClick={() => (setError(null), setDraft(emptyDraft()))}>
-          + Nouvelle catégorie
+          <Plus size={18} strokeWidth={2.2} aria-hidden />
+          Nouvelle catégorie
         </Button>
       </div>
       <Card className="!p-0">
-        <ul className="divide-y divide-separator">
+        <ul className="pt-list-inset">
           {active.map((c, i) => (
             <li key={c.id} className="flex items-center gap-1 pr-2">
               <button
@@ -91,10 +92,10 @@ export function CategoriesManager({
                   setError(null);
                   setDraft({ id: c.id, name: c.name, color: c.color, icon: c.icon, isIncome: c.isIncome, restrictedAccountIds: c.restrictedAccountIds });
                 }}
-                className="flex min-h-14 flex-1 items-center gap-3 px-4 text-left hover:bg-fill-tertiary"
+                className="flex min-h-11 flex-1 items-center gap-3 py-2.5 pl-4 text-left hover:bg-fill-tertiary md:py-2"
               >
                 <IconBadge icon={c.icon} color={c.color} />
-                <span className="flex-1 font-bold">{c.name}</span>
+                <span className="flex-1 truncate text-body">{c.name}</span>
                 <span className="text-body text-label-secondary tabular-nums">
                   {c.isIncome ? "Entrée" : budgetByCategory[c.id] !== undefined ? formatCents(budgetByCategory[c.id]!) : "-"}
                 </span>
@@ -103,7 +104,7 @@ export function CategoriesManager({
                 type="button"
                 disabled={i === 0 || pending}
                 onClick={() => run(() => moveCategory(c.id, "up"), undefined, undefined, `up-${c.id}`)}
-                className="flex size-10 items-center justify-center rounded-lg text-label-secondary hover:bg-fill-tertiary disabled:opacity-30"
+                className="flex size-11 items-center justify-center rounded-full text-label-secondary hover:bg-fill-tertiary disabled:opacity-30 md:size-7"
                 aria-label={`Monter ${c.name}`}
               >
                 {pending && action === `up-${c.id}` ? <Spinner size={16} label="Déplacement" /> : <ChevronUp size={18} />}
@@ -112,7 +113,7 @@ export function CategoriesManager({
                 type="button"
                 disabled={i === active.length - 1 || pending}
                 onClick={() => run(() => moveCategory(c.id, "down"), undefined, undefined, `down-${c.id}`)}
-                className="flex size-10 items-center justify-center rounded-lg text-label-secondary hover:bg-fill-tertiary disabled:opacity-30"
+                className="flex size-11 items-center justify-center rounded-full text-label-secondary hover:bg-fill-tertiary disabled:opacity-30 md:size-7"
                 aria-label={`Descendre ${c.name}`}
               >
                 {pending && action === `down-${c.id}` ? <Spinner size={16} label="Déplacement" /> : <ChevronDown size={18} />}
@@ -125,12 +126,12 @@ export function CategoriesManager({
 
       {archived.length > 0 && (
         <Card>
-          <h2 className="mb-2 text-foot font-bold text-label-secondary">Archivées</h2>
-          <ul className="divide-y divide-separator">
+          <h2 className="mb-2 text-heading">Archivées</h2>
+          <ul className="divide-y-[0.5px] divide-separator">
             {archived.map((c) => (
               <li key={c.id} className="flex items-center gap-3 py-2 opacity-70">
                 <IconBadge icon={c.icon} color={c.color} size="sm" />
-                <span className="flex-1 text-body font-semibold">{c.name}</span>
+                <span className="flex-1 truncate text-body">{c.name}</span>
                 <Button
                   variant="ghost"
                   disabled={pending}
@@ -175,7 +176,7 @@ export function CategoriesManager({
               <Label htmlFor="cat-name">Nom</Label>
               <Input id="cat-name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
             </div>
-            <label className="flex items-center gap-2 text-body font-semibold">
+            <label className="flex min-h-11 items-center gap-3 text-body md:min-h-7">
               <input type="checkbox" checked={draft.isIncome} onChange={(e) => setDraft({ ...draft, isIncome: e.target.checked })} />
               Catégorie de revenu (salaire…)
             </label>
@@ -188,11 +189,11 @@ export function CategoriesManager({
             />
             {!draft.isIncome && (
               <fieldset>
-                <legend className="mb-1.5 text-foot text-label-secondary">Comptes concernés par le budget</legend>
+                <legend className="mb-1.5 text-foot font-semibold text-label-secondary">Comptes concernés par le budget</legend>
                 <p className="mb-2 text-foot text-label-secondary">Aucun coché = tous les comptes « dans le budget ».</p>
                 <div className="flex flex-col gap-1.5">
                   {activeAccounts.map((a) => (
-                    <label key={a.id} className="flex items-center gap-2 text-body">
+                    <label key={a.id} className="flex min-h-11 items-center gap-3 text-body md:min-h-7">
                       <input
                         type="checkbox"
                         checked={draft.restrictedAccountIds.includes(a.id)}

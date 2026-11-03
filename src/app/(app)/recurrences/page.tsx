@@ -21,10 +21,8 @@ export default async function RecurrencesPage() {
   const monthlyCents = subscriptions.reduce((s, r) => s + monthlyEquivalentCents(r), 0);
 
   return (
-    <>
-      <div className="pr-12 lg:pr-0">
-        <PageHeader kicker="Gestion" title="Récurrences" />
-      </div>
+    <div className="flex flex-col gap-4">
+      <PageHeader kicker="Gestion" title="Récurrences" />
       <RecurrencesManager
         recurrences={recurrences}
         occurrences={occurrences}
@@ -33,6 +31,6 @@ export default async function RecurrencesPage() {
         startDay={profile.monthStartDay}
         today={today}
       />
-    </>
+    </div>
   );
 }

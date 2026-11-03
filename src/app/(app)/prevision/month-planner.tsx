@@ -456,7 +456,7 @@ function ProposalModal({
           Proposé : {formatCents(line.proposedCents)}
           {line.proposedDate && ` le ${shortDate(line.proposedDate)}`}. La modification ne vaut que pour {monthLabel(month).toLowerCase()}.
         </p>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 [&>*]:min-w-0">
           <div>
             <Label htmlFor="pr-amount">Montant</Label>
             <Input id="pr-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(sanitizeAmountInput(e.target.value))} />
@@ -598,7 +598,7 @@ function PlannedModal({
             placeholder={transfer ? defaultLabel() : "Assurance auto, prime, vacances…"}
           />
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 [&>*]:min-w-0">
           <div>
             <Label htmlFor="pl-amount">Montant</Label>
             <Input id="pl-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(sanitizeAmountInput(e.target.value))} placeholder="0,00" />

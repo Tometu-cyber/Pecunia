@@ -9,7 +9,8 @@ import { sanitizeAmountInput } from "@/lib/domain/money";
 import type { ExistingLine } from "@/lib/domain/csv-import";
 import type { Account, Category } from "@/lib/domain/types";
 
-const cell = "h-9 w-full rounded-lg border border-transparent bg-transparent px-2 text-body hover:border-separator-opaque focus:border-finances focus:bg-bg-grouped-secondary focus:outline-none";
+// cellule éditable du tableau d'import (ordi) : champ compact façon macOS, fond au survol
+const cell = "h-7 w-full rounded-xs border border-transparent bg-transparent px-2 text-[13px] text-label hover:bg-fill-tertiary focus:border-finances focus:bg-bg-tertiary focus:shadow-[0_0_0_3px_var(--finances-bg)] focus:outline-none";
 
 export interface RowActions {
   update: (key: string, patch: Partial<DraftRow>) => void;
@@ -43,7 +44,7 @@ export const ImportRowView = memo(function ImportRowView({
   return (
     <tr
       className={clsx(
-        "border-b border-separator align-middle",
+        "border-b-[0.5px] border-separator align-middle",
         !row.include && "opacity-45",
         row.include && problem && "bg-danger/12",
       )}
@@ -114,7 +115,7 @@ export const ImportRowView = memo(function ImportRowView({
       </td>
       <td className="w-32">
         <div className="flex items-center">
-          <span className={clsx("w-3 text-body font-bold", outflow ? "text-label-secondary" : "text-finances-text")}>{outflow ? "−" : "+"}</span>
+          <span className={clsx("w-3 text-body font-semibold", outflow ? "text-label-secondary" : "text-finances-text")}>{outflow ? "−" : "+"}</span>
           <input
             inputMode="decimal"
             value={row.amount}
@@ -147,7 +148,7 @@ export const ImportRowView = memo(function ImportRowView({
         <button
           type="button"
           onClick={() => actions.remove(row.key)}
-          className="flex size-8 items-center justify-center rounded-lg text-label-secondary hover:bg-danger/12 hover:text-danger-text"
+          className="flex size-7 items-center justify-center rounded-full text-label-secondary hover:bg-danger/12 hover:text-danger-text"
           aria-label="Supprimer la ligne"
         >
           <Trash2 size={15} />

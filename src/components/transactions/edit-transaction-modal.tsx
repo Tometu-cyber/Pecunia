@@ -153,7 +153,7 @@ export function EditTransactionModal({
             <Label htmlFor="edit-place">{form.kind === "transfer" ? "Libellé" : "Lieu / source"}</Label>
             <Input id="edit-place" value={form.place} onChange={(e) => set({ place: e.target.value })} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 [&>*]:min-w-0">
             <div>
               <Label htmlFor="edit-account">{form.kind === "transfer" ? "Depuis" : "Compte"}</Label>
               <Select id="edit-account" value={form.accountId ?? ""} onChange={(e) => set({ accountId: e.target.value })}>
@@ -201,7 +201,7 @@ export function EditTransactionModal({
               ]}
             />
           )}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 [&>*]:min-w-0">
             <div>
               <Label htmlFor="edit-date">Date</Label>
               <Input id="edit-date" type="date" value={form.date} onChange={(e) => e.target.value && set({ date: e.target.value })} />

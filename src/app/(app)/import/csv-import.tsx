@@ -5,7 +5,7 @@ import { clsx } from "clsx";
 import { CircleCheck, FileUp, Plus, TriangleAlert } from "lucide-react";
 import { useCallback, useMemo, useRef, useState, useTransition } from "react";
 import { useAppData } from "@/components/app/app-data";
-import { Banner, Button, Card, Chip, Label, Select, buttonClass } from "@/components/ui/primitives";
+import { Banner, Button, Card, Chip, Label, Select, buttonClass, inputClass } from "@/components/ui/primitives";
 import { useToast } from "@/components/ui/overlay";
 import { getLinesInRange, importTransactions } from "@/lib/data/import-actions";
 import {
@@ -282,7 +282,7 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
         <Banner
           tone="success"
           action={
-            <Link href={`/transactions?compte=${result.accountId}`} className="font-bold">
+            <Link href={`/transactions?compte=${result.accountId}`} className="font-semibold">
               Voir les transactions
             </Link>
           }
@@ -344,7 +344,7 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
       {/* Étape 2 : correspondance des colonnes */}
       {file && (
         <Card>
-          <h2 className="mb-3 text-foot font-bold text-label-secondary">Correspondance des colonnes</h2>
+          <h2 className="mb-3 text-heading">Correspondance des colonnes</h2>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {file.parsed.header.map((h, i) => (
               <div key={i}>
@@ -400,7 +400,7 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
       )}
       {drafts && account && (
         <Card className="!p-0">
-          <div className="flex flex-col gap-3 border-b border-separator p-4">
+          <div className="flex flex-col gap-3 border-b-[0.5px] border-separator p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
                 {(
@@ -423,7 +423,7 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Rechercher un libellé"
-                  className="min-h-9 rounded-[10px] border border-separator-opaque bg-bg-grouped-secondary px-3 text-body focus:border-finances focus:outline-none"
+                  className={inputClass}
                 />
                 <Button onClick={addRow}>
                   <Plus size={15} /> Ajouter une ligne
@@ -440,7 +440,7 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
 
           <div className="max-h-[60vh] overflow-auto">
             <table className="w-full min-w-[980px] text-left">
-              <thead className="sticky top-0 z-10 bg-bg-grouped-secondary text-foot font-bold text-label-secondary shadow-[0_1px_0_var(--divider)]">
+              <thead className="sticky top-0 z-10 bg-bg-grouped-secondary text-foot font-semibold text-label-secondary shadow-[0_0.5px_0_var(--separator)]">
                 <tr>
                   <th className="w-8 px-2 py-2">
                     <input
@@ -482,7 +482,7 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
           </div>
 
           {/* Pied : récapitulatif, solde et validation */}
-          <div className="flex flex-col gap-3 border-t border-separator p-4">
+          <div className="flex flex-col gap-3 border-t-[0.5px] border-separator p-4">
             {file?.opening && (
               <label className="flex items-start gap-2 text-body">
                 <input type="checkbox" checked={setOpening} onChange={(e) => setSetOpening(e.target.checked)} className="mt-0.5" />
@@ -509,9 +509,9 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
                       {" "}
                       · total du fichier {formatCents(file.closingFromFile)}{" "}
                       {projected === file.closingFromFile ? (
-                        <span className="font-bold text-finances-text">✓ identique</span>
+                        <span className="font-semibold text-finances-text">identique</span>
                       ) : (
-                        <span className="font-bold text-label">écart de {formatCents((projected ?? 0) - file.closingFromFile, "always")}</span>
+                        <span className="font-semibold text-label">écart de {formatCents((projected ?? 0) - file.closingFromFile, "always")}</span>
                       )}
                     </>
                   )}

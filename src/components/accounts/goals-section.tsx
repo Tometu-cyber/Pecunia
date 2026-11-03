@@ -18,23 +18,23 @@ export function GoalCard({ status, onClick }: { status: GoalStatus; onClick?: ()
   const g = status.goal;
   const account = accountById.get(g.accountId);
   return (
-    <button type="button" onClick={onClick} className="w-full rounded-lg bg-bg-grouped-secondary p-4 text-left shadow-card transition-shadow hover:shadow-popover">
+    <button type="button" onClick={onClick} className="w-full rounded-lg bg-bg-grouped-secondary p-4 text-left shadow-card transition-[transform,background-color] hover:bg-fill-tertiary motion-safe:active:scale-[0.98] md:p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <span className="flex size-9 items-center justify-center rounded-[10px] bg-fill-tertiary text-label-secondary">
+          <span className="flex size-[30px] items-center justify-center rounded-full bg-finances-bg text-finances-text">
             <Flag size={16} />
           </span>
           <div>
-            <p className="font-bold">{g.name}</p>
+            <p className="text-body font-semibold">{g.name}</p>
             <p className="flex items-center gap-1 text-foot text-label-secondary">
-              <span className="size-1.5 rounded-full" style={{ backgroundColor: account?.color }} />
+              <span className="size-2 rounded-full" style={{ backgroundColor: account?.color }} />
               {account?.name} · avant le {numericDate(g.targetDate)}
             </p>
           </div>
         </div>
         <span
           className={clsx(
-            "shrink-0 rounded-full px-2 py-0.5 text-foot font-bold",
+            "shrink-0 rounded-full px-2 py-0.5 text-foot font-semibold",
             status.onTrack ? "bg-finances-bg text-finances-text" : "bg-warning/15 text-label",
           )}
         >
@@ -43,12 +43,12 @@ export function GoalCard({ status, onClick }: { status: GoalStatus; onClick?: ()
       </div>
       <div className="mt-3 flex items-baseline justify-between">
         <p>
-          <span className="text-heading font-bold tabular-nums">{formatCents(status.currentCents)}</span>
+          <span className="font-rounded text-[20px] leading-[25px] font-semibold tabular-nums md:text-[17px]">{formatCents(status.currentCents)}</span>
           <span className="text-foot text-label-secondary"> / {formatCents(g.targetCents)}</span>
         </p>
-        <span className={clsx("text-body font-bold", status.onTrack ? "text-finances-text" : "text-label")}>{formatPercent(status.progress, 0)}</span>
+        <span className={clsx("text-body font-semibold", status.onTrack ? "text-finances-text" : "text-label")}>{formatPercent(status.progress, 0)}</span>
       </div>
-      <div className="mt-2 h-2 overflow-hidden rounded-full bg-fill-secondary">
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-fill-primary">
         <div className={clsx("h-full rounded-full", status.onTrack ? "bg-finances" : "bg-warning")} style={{ width: `${status.progress * 100}%` }} />
       </div>
       <p className="mt-2 text-foot text-label-secondary">
@@ -141,7 +141,7 @@ export function GoalFormModal({ goal, onClose, defaultAccountId }: { goal: Goal 
             ))}
           </Select>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 [&>*]:min-w-0">
           <div>
             <Label htmlFor="goal-target">Montant cible</Label>
             <Input id="goal-target" inputMode="decimal" value={target} onChange={(e) => setTarget(sanitizeAmountInput(e.target.value))} placeholder="0,00" />
@@ -167,13 +167,13 @@ export function GoalsSection({ statuses }: { statuses: GoalStatus[] }) {
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-heading font-bold">Objectifs d&apos;épargne</h2>
+        <h2 className="text-heading">Objectifs d&apos;épargne</h2>
         <Button onClick={() => setEditing({ goal: null, key: Date.now() })}>
           <Plus size={15} /> Nouvel objectif
         </Button>
       </div>
       {statuses.length === 0 ? (
-        <p className="rounded-xl bg-fill-tertiary p-4 text-body text-label-secondary">
+        <p className="rounded-md bg-fill-tertiary p-4 text-sub text-label-secondary">
           Aucun objectif. Fixe un montant et une date (voyage, fonds d&apos;urgence…) pour suivre ta progression.
         </p>
       ) : (

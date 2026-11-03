@@ -46,7 +46,7 @@ export function IconColorPicker({
               onClick={() => onIcon(name)}
               aria-pressed={icon === name}
               aria-label={name}
-              className={clsx("rounded-xl p-0.5 ring-2", icon === name ? "ring-label" : "ring-transparent")}
+              className={clsx("rounded-md p-0.5 ring-2", icon === name ? "ring-label" : "ring-transparent")}
             >
               <IconBadge icon={name} color={color} />
             </button>
@@ -138,7 +138,7 @@ export function NewAccountButton({ compact = false }: { compact?: boolean }) {
               options={(Object.keys(ACCOUNT_TYPE_LABELS) as AccountType[]).map((t) => ({ value: t, label: ACCOUNT_TYPE_LABELS[t] }))}
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 [&>*]:min-w-0">
             <div>
               <Label htmlFor="acc-balance">Solde initial</Label>
               <Input
@@ -232,7 +232,7 @@ export function AdjustBalanceButton({ account, balanceCents }: { account: Accoun
         }
       >
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between rounded-xl bg-fill-tertiary px-3 py-2.5 text-body">
+          <div className="flex items-center justify-between rounded-md bg-fill-tertiary px-3 py-2.5 text-body">
             <span className="text-label-secondary">Solde calculé par Pecunia</span>
             <strong className="tabular-nums">{formatCents(balanceCents)}</strong>
           </div>
@@ -243,7 +243,7 @@ export function AdjustBalanceButton({ account, balanceCents }: { account: Accoun
               inputMode="decimal"
               value={value}
               onChange={(e) => setValue(sanitizeAmountInput(e.target.value, true))}
-              className="!text-heading font-bold"
+              className="font-rounded !text-[22px] font-semibold md:!text-[17px]"
             />
           </div>
           {diff !== null && (
@@ -312,7 +312,7 @@ export function AccountSettings({ account, balanceCents }: { account: Account; b
           }}
         />
       </label>
-      <div className="grid grid-cols-2 gap-2 border-t border-separator pt-3">
+      <div className="grid grid-cols-2 gap-2 border-t-[0.5px] border-separator pt-3">
         <Button onClick={() => setEditOpen(true)}>
           <Pencil size={14} /> Modifier
         </Button>
