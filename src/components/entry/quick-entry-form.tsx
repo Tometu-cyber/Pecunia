@@ -516,11 +516,11 @@ export function QuickEntryForm({
       )}
 
       <div className={clsx("grid grid-cols-2 gap-3", !isSheet && "md:grid-cols-4")}>
-        <div>
+        <div className="min-w-0">
           <Label htmlFor="entry-date">Date</Label>
           <Input id="entry-date" type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)} required />
         </div>
-        <div className={clsx(!isSheet && "md:col-span-1")}>
+        <div className={clsx("min-w-0", !isSheet && "md:col-span-1")}>
           <Label htmlFor="entry-note">Note</Label>
           <Input id="entry-note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Facultatif" />
         </div>
