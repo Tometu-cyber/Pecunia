@@ -4,35 +4,13 @@
  * En-tête de l'accueil : grand titre et menu « … » sur mobile, barre d'outils avec le filtre
  * de compte, les flèches de mois et « Nouvelle saisie » sur ordi.
  */
-import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { AppHeader } from "@/components/ui/app-header";
 import { PECUNIA_APP } from "@/components/ui/ds";
-import { Menu } from "@/components/ui/menu";
-import { SegmentedControl } from "@/components/ui/segmented-control";
 import { useMoreMenuItems } from "@/components/app/navigation";
+import { AccountFilter, type FilterOption } from "@/components/app/account-filter";
 
-export interface FilterOption {
-  id: string;
-  label: string;
-  href: string;
-}
-
-/** Au-delà de 4 choix (Tous + 3 comptes), le contrôle segmenté laisse la place à un menu. */
-const MAX_SEGMENTS = 4;
-
-/** Filtre de compte (Tous, Courant, Livret A…), en lien avec l'URL (?compte=). */
-export function AccountFilter({ options, value, size = "regular", full }: { options: FilterOption[]; value: string; size?: "regular" | "small"; full?: boolean }) {
-  const router = useRouter();
-  const go = (id: string) => {
-    const href = options.find((o) => o.id === id)?.href;
-    if (href) router.push(href, { scroll: false });
-  };
-  if (options.length > MAX_SEGMENTS) {
-    return <Menu label="Compte" size={size} value={value} items={options.map((o) => ({ id: o.id, label: o.label, href: o.href }))} />;
-  }
-  return <SegmentedControl label="Compte" size={size} full={full} value={value} onChange={go} items={options.map((o) => ({ id: o.id, label: o.label }))} />;
-}
+export { AccountFilter, type FilterOption } from "@/components/app/account-filter";
 
 export function DashboardHeader({
   title,

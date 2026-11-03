@@ -2,6 +2,7 @@
 
 import { clsx } from "clsx";
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { CircleAlert, CircleCheck, X } from "lucide-react";
 import { animateSpring, project, rubberband, SPRINGS, velocityFrom, type SpringAnimation, type SpringConfig } from "@/lib/motion/spring";
 
 /** Préférence système « réduire les animations ». */
@@ -193,37 +194,38 @@ export function Modal({
   const dragProps = { onPointerDown, onPointerMove, onPointerUp, onPointerCancel: onPointerUp };
   return (
     <div className={clsx("fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-6", !open && "pointer-events-none")} role="presentation">
-      <div ref={scrimRef} className="absolute inset-0 bg-n-900/45" style={{ opacity: 0 }} onClick={onClose} aria-hidden />
+      <div ref={scrimRef} className="absolute inset-0 bg-glass-dim" style={{ opacity: 0 }} onClick={onClose} aria-hidden />
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         style={{ opacity: 0 }}
         className={clsx(
-          "relative flex max-h-[92dvh] w-full flex-col rounded-t-[22px] bg-surface shadow-modal will-change-transform md:rounded-[18px]",
+          // feuille iOS 26 : flotte à 8 px des bords, coins de 34 px ; fenêtre centrée sur ordi
+          "relative mx-2 mb-[calc(8px+env(safe-area-inset-bottom,0px))] flex max-h-[calc(100dvh-60px)] w-[calc(100%-16px)] flex-col rounded-xl bg-bg-grouped text-label shadow-popover will-change-transform md:m-0 md:max-h-[88dvh] md:w-full md:rounded-lg md:bg-bg-primary md:shadow-window",
           size === "lg" ? "md:max-w-2xl" : "md:max-w-md",
         )}
       >
         {/* poignée : zone de glisser de la feuille mobile */}
         <div {...dragProps} className="flex shrink-0 touch-none justify-center pt-2 pb-1 md:hidden" aria-hidden>
-          <span className="h-1.5 w-10 rounded-full bg-n-300" />
+          <span className="h-[5px] w-9 rounded-full bg-label-tertiary" />
         </div>
         {shownTitle && (
-          <div {...dragProps} className="flex touch-none items-center justify-between gap-3 px-5 pt-3 md:touch-auto md:pt-5">
-            <h2 className="text-lg font-bold">{shownTitle}</h2>
+          <div {...dragProps} className="flex touch-none items-center justify-between gap-3 px-4 pt-1.5 md:touch-auto md:px-5 md:pt-5">
+            <h2 className="text-[17px] leading-[22px] font-semibold tracking-[-0.43px] md:text-[15px] md:leading-5 md:font-bold md:tracking-[-0.23px]">{shownTitle}</h2>
             <button
               type="button"
               data-close
               onClick={onClose}
-              className="-mr-2 flex size-10 items-center justify-center rounded-full text-xl text-n-600 hover:bg-n-100 motion-safe:active:scale-90"
+              className="pt-glass -mr-1 flex size-11 shrink-0 items-center justify-center rounded-full text-label transition-transform motion-safe:active:scale-95 md:size-7"
               aria-label="Fermer"
             >
-              ×
+              <X size={18} strokeWidth={1.75} aria-hidden />
             </button>
           </div>
         )}
-        <div className="overflow-y-auto overscroll-contain px-5 py-4">{shownChildren}</div>
-        {shownFooter && <div className="flex justify-end gap-2 border-t border-divider px-5 py-3 pb-safe">{shownFooter}</div>}
+        <div className="overflow-y-auto overscroll-contain px-4 py-4 md:px-5">{shownChildren}</div>
+        {shownFooter && <div className="flex justify-end gap-2 border-t-[0.5px] border-separator px-4 py-3 md:px-5">{shownFooter}</div>}
       </div>
     </div>
   );
@@ -260,18 +262,22 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={push}>
       {children}
       <div
-        className="pointer-events-none fixed inset-x-0 bottom-24 z-[60] flex flex-col items-center gap-2 px-4 md:bottom-6"
+        className="pointer-events-none fixed inset-x-0 bottom-[calc(96px+env(safe-area-inset-bottom,0px))] z-[60] flex flex-col items-center gap-2 px-4 md:bottom-6"
         aria-live="polite"
       >
         {toasts.map((t) => (
           <div
             key={t.id}
             className={clsx(
-              "pointer-events-auto rounded-xl px-4 py-2.5 text-sm font-semibold shadow-pop",
+              "pointer-events-auto flex items-center gap-2 rounded-full bg-bg-tertiary px-4 py-2.5 text-[15px] font-semibold tracking-[-0.23px] text-label shadow-popover md:text-[13px]",
               t.leaving ? "toast-out" : "toast-in",
-              t.tone === "success" ? "bg-ink text-on-ink" : "bg-danger-solid text-white",
             )}
           >
+            {t.tone === "success" ? (
+              <CircleCheck size={18} strokeWidth={2} className="shrink-0 text-finances-text" aria-hidden />
+            ) : (
+              <CircleAlert size={18} strokeWidth={2} className="shrink-0 text-danger-text" aria-hidden />
+            )}
             {t.message}
           </div>
         ))}

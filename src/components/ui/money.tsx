@@ -26,7 +26,7 @@ export function Amount({
     <span
       className={clsx(
         "whitespace-nowrap tabular-nums",
-        neutral || type === "transfer" ? "text-n-600" : cents > 0 ? "font-semibold text-accent-700" : "text-text",
+        neutral || type === "transfer" ? "text-label-secondary" : cents > 0 ? "font-semibold text-finances-text" : "font-semibold text-label",
         className,
       )}
     >

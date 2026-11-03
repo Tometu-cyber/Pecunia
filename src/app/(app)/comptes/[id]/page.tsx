@@ -78,7 +78,7 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
             <AdjustBalanceButton account={account} balanceCents={balance} />
           </div>
           <div className="mt-3">
-            <BalanceArea data={months.map((m, i) => ({ label: monthAbbr(m), cents: series[i]! }))} color={account.color} />
+            <BalanceArea data={months.map((m, i) => ({ label: monthAbbr(m), cents: series[i]! }))} />
           </div>
           <div className="mt-3 grid grid-cols-3 border-t border-divider pt-3 lg:hidden">
             {stats.map((s) => (

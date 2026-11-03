@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { clsx } from "clsx";
 import { useState, useTransition, type CSSProperties, type ReactNode } from "react";
 import {
   ArrowLeftRight,
@@ -13,7 +11,6 @@ import {
   LayoutGrid,
   ListFilter,
   LogOut,
-  Menu as MenuIcon,
   Plus,
   SlidersHorizontal,
   TrendingUp,
@@ -70,8 +67,8 @@ const MORE: NavItem[] = [
   { href: "/analyses", label: "Analyses", icon: ChartColumn },
 ];
 
-/** Écrans déjà refaits avec le design system : ils gèrent eux-mêmes en-tête et marges. */
-const DS_ROUTES = ["/"];
+/** Écrans qui gèrent eux-mêmes leurs marges (en-tête pleine largeur) : l'accueil. */
+const FULL_BLEED_ROUTES = ["/"];
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
@@ -155,69 +152,20 @@ export function useMoreMenuItems(): MenuItem[] {
 }
 
 /**
- * Cadre du contenu. Les écrans refaits avec le design system gèrent leurs marges (en-tête
- * pleine largeur) ; les autres gardent l'ancien cadre jusqu'à leur migration.
+ * Cadre du contenu : décalage de la barre latérale (ordi), place pour la barre d'onglets
+ * (mobile), marges d'écran (16 px sur mobile, 20 px sur ordi) et largeur maximum.
+ * L'en-tête de chaque écran (ScreenHeader) déborde sur ces marges pour rester pleine largeur.
  */
 export function ContentFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const ds = DS_ROUTES.some((r) => (r === "/" ? pathname === "/" : isActive(pathname, r)));
-  if (ds) {
-    return (
-      <main
-        className="relative min-w-0 pb-[var(--content-pb)] md:pb-0 md:pl-[256px]"
-        // barre d'onglets : hauteur + écart avec le bas + space-8 de respiration
-        style={{ "--content-pb": "calc(var(--tabbar-height) + var(--space-4) + var(--space-8) + env(safe-area-inset-bottom, 0px))" } as CSSProperties}
-      >
-        {children}
-      </main>
-    );
-  }
+  const fullBleed = FULL_BLEED_ROUTES.includes(pathname);
   return (
-    <main className="relative min-w-0 px-4 pt-5 pb-32 md:pt-7 md:pr-8 md:pb-10 md:pl-[276px]">
-      <MoreMenu />
-      <div className="mx-auto max-w-6xl">{children}</div>
+    <main
+      className="relative min-w-0 pb-[var(--content-pb)] md:pb-0 md:pl-[256px]"
+      // barre d'onglets : hauteur + écart avec le bas + space-8 de respiration
+      style={{ "--content-pb": "calc(var(--tabbar-height) + var(--space-4) + var(--space-8) + env(safe-area-inset-bottom, 0px))" } as CSSProperties}
+    >
+      {fullBleed ? children : <div className="px-4 md:max-w-[calc(var(--content-max)+44px)] md:px-5 md:pb-7">{children}</div>}
     </main>
-  );
-}
-
-/** Bouton ≡ (mobile) ouvrant le menu « Plus », pour les écrans pas encore refaits. */
-export function MoreMenu() {
-  const [open, setOpen] = useState(false);
-  const items: NavItem[] = [...MORE, { href: "/parametres", label: "Paramètres", icon: SlidersHorizontal }];
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="absolute top-4 right-3 z-10 flex size-11 items-center justify-center rounded-full text-n-700 hover:bg-n-200 active:bg-n-200 md:hidden"
-        aria-label="Plus"
-      >
-        <MenuIcon size={22} />
-      </button>
-      <Modal open={open} onClose={() => setOpen(false)}>
-        <nav className="-mx-2 flex flex-col" aria-label="Plus">
-          {items.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setOpen(false)}
-              className={clsx("flex min-h-12 items-center gap-3 rounded-lg px-2 font-semibold hover:bg-n-100")}
-            >
-              <item.icon size={19} className="text-n-600" />
-              {item.label}
-            </Link>
-          ))}
-          <form action={signOut} className="mt-2 border-t border-divider pt-2">
-            <SubmitButton
-              className="flex min-h-12 w-full items-center gap-3 rounded-lg px-2 font-semibold text-danger-700 hover:bg-danger-100"
-              pendingChildren="Déconnexion…"
-            >
-              <LogOut size={19} />
-              Se déconnecter
-            </SubmitButton>
-          </form>
-        </nav>
-      </Modal>
-    </>
   );
 }

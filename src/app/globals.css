@@ -409,6 +409,82 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Typographie qui change d'échelle au point de rupture (768 px) : ios-* sur mobile,
+   mac-* sur ordi (design-system/README.md, § 7).
+   --------------------------------------------------------------------------- */
+/* corps : 17 px (ios-body) / 13 px (mac-body) */
+@utility text-body {
+  font-size: 17px;
+  line-height: 22px;
+  letter-spacing: -0.43px;
+  @media (width >= 768px) {
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: -0.08px;
+  }
+}
+/* sous-titres, métadonnées : 15 px (ios-subheadline) / 12 px (mac-callout) */
+@utility text-sub {
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: -0.23px;
+  @media (width >= 768px) {
+    font-size: 12px;
+    line-height: 15px;
+    letter-spacing: 0;
+  }
+}
+/* notes, légendes : 13 px (ios-footnote) / 11 px (mac-subheadline) */
+@utility text-foot {
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: -0.08px;
+  @media (width >= 768px) {
+    font-size: 11px;
+    line-height: 14px;
+    letter-spacing: 0.06px;
+  }
+}
+/* titre de bloc : 20 px (ios-title-3) / 15 px (mac-title-3), demi-gras */
+@utility text-heading {
+  font-size: 20px;
+  line-height: 25px;
+  letter-spacing: -0.45px;
+  font-weight: 600;
+  @media (width >= 768px) {
+    font-size: 15px;
+    line-height: 20px;
+    letter-spacing: -0.23px;
+  }
+}
+/* chiffre clé : police arrondie, 28 px (stat-lg) / 22 px */
+@utility text-stat {
+  font-family: var(--font-rounded);
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  @media (width >= 768px) {
+    font-size: 22px;
+    line-height: 28px;
+  }
+}
+/* grand chiffre d'écran : 44 px sur mobile (comme le solde de l'accueil), 28 px sur ordi */
+@utility text-stat-hero {
+  font-family: var(--font-rounded);
+  font-size: 44px;
+  line-height: 50px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+  @media (width >= 768px) {
+    font-size: 28px;
+    line-height: 34px;
+    letter-spacing: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
    Base
    --------------------------------------------------------------------------- */
 html,
@@ -467,6 +543,23 @@ input[type="month"]::-webkit-date-and-time-value {
   margin: 0;
   min-height: 1lh;
   text-align: left;
+}
+
+/* Listes déroulantes natives (Select) : sans l'apparence du système, avec un chevron
+   double façon menu iOS / macOS. */
+select.pt-select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 15 5 5 5-5'/%3E%3Cpath d='m7 9 5-5 5 5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+}
+@media (min-width: 768px) {
+  select.pt-select {
+    background-position: right 8px center;
+    background-size: 12px;
+  }
 }
 
 input[type="checkbox"] {

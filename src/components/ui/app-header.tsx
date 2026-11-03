@@ -29,6 +29,9 @@ export interface AppHeaderProps {
   actions?: AppHeaderAction[];
   /** Ordi : élément au centre de la barre d'outils */
   center?: ReactNode;
+  /** Éléments libres ajoutés avant les actions (boutons déjà rendus, menus…) */
+  trailing?: ReactNode;
+  /** Appliquée à la barre et, sur mobile, au bloc du grand titre */
   className?: string;
 }
 
@@ -42,7 +45,7 @@ function scrollParent(el: HTMLElement | null): HTMLElement | Window {
   return window;
 }
 
-export function AppHeader({ title, subtitle, eyebrow, app, platform = "ios", back, actions = [], center, className }: AppHeaderProps) {
+export function AppHeader({ title, subtitle, eyebrow, app, platform = "ios", back, actions = [], center, trailing, className }: AppHeaderProps) {
   const mac = platform === "mac";
   const [collapsed, setCollapsed] = useState(false);
   const rootRef = useRef<HTMLElement>(null);
@@ -86,7 +89,10 @@ export function AppHeader({ title, subtitle, eyebrow, app, platform = "ios", bac
             {subtitle && <p className="pt-hdr-mac-sub">{subtitle}</p>}
           </div>
           {center}
-          <div className="pt-hdr-actions">{renderedActions}</div>
+          <div className="pt-hdr-actions">
+            {trailing}
+            {renderedActions}
+          </div>
         </div>
       </header>
     );
@@ -99,10 +105,13 @@ export function AppHeader({ title, subtitle, eyebrow, app, platform = "ios", bac
           <div className="pt-hdr-small" aria-hidden={collapsed ? undefined : true}>
             {title}
           </div>
-          <div className="pt-hdr-side pt-hdr-actions">{renderedActions}</div>
+          <div className="pt-hdr-side pt-hdr-actions">
+            {trailing}
+            {renderedActions}
+          </div>
         </div>
       </header>
-      <div ref={bigRef} className={clsx("pt-root pt-hdr-big", appClass(app))}>
+      <div ref={bigRef} className={clsx("pt-root pt-hdr-big", appClass(app), className)}>
         {eyebrow && <div className="pt-hdr-eyebrow">{eyebrow}</div>}
         <h1 className="pt-hdr-title">{title}</h1>
         {subtitle && <p className="pt-hdr-sub">{subtitle}</p>}
