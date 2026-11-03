@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
         <Button type="submit" variant="primary" loading={pending} className="w-full">
           {pending ? "Envoi…" : "Envoyer le lien"}
         </Button>
-        <Link href="/login" className="text-sm font-bold text-accent-700">
+        <Link href="/login" className="inline-flex min-h-11 items-center justify-center text-body font-semibold text-finances-text hover:underline md:min-h-7">
           ← Retour à la connexion
         </Link>
       </form>

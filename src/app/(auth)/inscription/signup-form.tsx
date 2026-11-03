@@ -70,7 +70,7 @@ export function SignupForm() {
       <Button type="submit" variant="primary" loading={pending} className="w-full">
         {pending ? "Création du compte…" : "Créer mon compte"}
       </Button>
-      <Link href="/login" className="text-sm font-bold text-accent-700">
+      <Link href="/login" className="inline-flex min-h-11 items-center justify-center text-body font-semibold text-finances-text hover:underline md:min-h-7">
         ← J&apos;ai déjà un compte
       </Link>
     </form>
