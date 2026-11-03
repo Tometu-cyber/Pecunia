@@ -595,3 +595,28 @@ a.pt-btn-gray { color: var(--label); }
     transform: translate(-50%, -50%);
   }
 }
+
+/* Barre d'onglets glissable (façon iOS 26) : une pastille sous l'onglet actif, qui suit
+   le doigt pendant un glissé. Elle remplace le fond de l'onglet actif. */
+.pt-tabbar.has-pill {
+  position: relative;
+  touch-action: none; /* le glissé horizontal reste dans la barre */
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+.pt-tabbar.has-pill .pt-tab { position: relative; z-index: 1; -webkit-user-drag: none; }
+.pt-tabbar.has-pill .pt-tab[aria-current="page"] { background: transparent; }
+.pt-tab-pill {
+  position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 0;
+  border-radius: var(--radius-full); background: var(--fill-secondary); pointer-events: none;
+  transition: translate 340ms cubic-bezier(.3, 1.25, .5, 1), width 340ms cubic-bezier(.3, 1.25, .5, 1), scale 200ms ease, background-color 200ms ease;
+}
+/* pendant le glissé : la pastille colle au doigt et grossit comme une loupe */
+.pt-tabbar.is-dragging .pt-tab-pill {
+  transition: scale 200ms ease, background-color 200ms ease;
+  scale: 1.1; background: var(--fill-primary);
+}
+.pt-tabbar-row .pt-tabbar.is-dragging .pt-tab[aria-current="page"]:not(.is-over) { color: var(--label); }
+.pt-tabbar.is-dragging .pt-tab.is-over { color: var(--app-text); }
+@media (prefers-reduced-motion: reduce) {
+  .pt-tab-pill, .pt-tabbar.is-dragging .pt-tab-pill { transition: none; scale: 1; }
+}
