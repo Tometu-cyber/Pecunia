@@ -333,82 +333,6 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Anciens noms de la palette (sarcelle, n-100, accent-700…), redirigés vers les
-   tokens du design system. Ils ne servent plus qu'aux écrans pas encore refaits
-   (Transactions, Comptes, Budgets, Prévisionnel, Saisie, Paramètres…) :
-   à supprimer quand le dernier écran sera migré. Ne pas les utiliser dans du
-   nouveau code.
-   --------------------------------------------------------------------------- */
-:root {
-  --bg: var(--bg-grouped);
-  --surface: var(--bg-grouped-secondary);
-  --text: var(--label);
-  --divider: var(--separator-opaque);
-  --accent: var(--finances);
-  --accent-100: var(--finances-bg);
-  --accent-200: color-mix(in srgb, var(--finances) 35%, transparent);
-  --accent-500: var(--finances);
-  --accent-600: color-mix(in srgb, var(--finances) 86%, #000000);
-  --accent-700: var(--finances-text);
-  --n-100: var(--fill-tertiary);
-  --n-200: var(--fill-secondary);
-  --n-300: var(--gray-4);
-  --n-400: var(--gray-3);
-  --n-500: var(--label-tertiary);
-  --n-600: var(--label-secondary);
-  --n-700: var(--label-secondary);
-  --n-800: var(--label);
-  --n-900: var(--label);
-  --warn: var(--warning);
-  --warn-100: color-mix(in srgb, var(--warning) 16%, var(--bg-grouped-secondary));
-  --warn-800: var(--label);
-  --danger-100: color-mix(in srgb, var(--danger) 12%, var(--bg-grouped-secondary));
-  --danger-700: var(--danger-text);
-  /* fond plein des boutons et toasts d'erreur : texte blanc à 5,5:1 dans les deux thèmes */
-  --danger-solid: #d70015;
-  --on-accent: var(--on-finances);
-  --on-warn: #000000;
-  --ink: var(--label);
-  --on-ink: var(--bg-primary);
-}
-
-@theme inline {
-  --color-bg: var(--bg);
-  --color-surface: var(--surface);
-  --color-text: var(--text);
-  --color-divider: var(--divider);
-  --color-accent: var(--accent);
-  --color-on-accent: var(--on-accent);
-  --color-on-warn: var(--on-warn);
-  --color-danger-solid: var(--danger-solid);
-  --color-accent-100: var(--accent-100);
-  --color-accent-200: var(--accent-200);
-  --color-accent-500: var(--accent-500);
-  --color-accent-600: var(--accent-600);
-  --color-accent-700: var(--accent-700);
-  --color-n-100: var(--n-100);
-  --color-n-200: var(--n-200);
-  --color-n-300: var(--n-300);
-  --color-n-400: var(--n-400);
-  --color-n-500: var(--n-500);
-  --color-n-600: var(--n-600);
-  --color-n-700: var(--n-700);
-  --color-n-800: var(--n-800);
-  --color-n-900: var(--n-900);
-  --color-warn: var(--warn);
-  --color-warn-100: var(--warn-100);
-  --color-warn-800: var(--warn-800);
-  --color-danger-100: var(--danger-100);
-  --color-danger-700: var(--danger-700);
-  --color-ink: var(--ink);
-  --color-on-ink: var(--on-ink);
-  --shadow-pop: var(--shadow-popover);
-  --shadow-modal: var(--shadow-popover);
-  --radius-card: var(--radius-lg);
-  --radius-field: var(--radius-sm);
-}
-
-/* ---------------------------------------------------------------------------
    Typographie qui change d'échelle au point de rupture (768 px) : ios-* sur mobile,
    mac-* sur ordi (design-system/README.md, § 7).
    --------------------------------------------------------------------------- */
@@ -578,34 +502,6 @@ input[type="checkbox"] {
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
-}
-
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* ---------------------------------------------------------------------------
-   Matériaux : couche translucide flottante, le contenu défile dessous.
-   Arête claire en haut = la lumière qui accroche la matière.
-   --------------------------------------------------------------------------- */
-.material-bar {
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 -1px 0 var(--separator);
-}
-@media (prefers-reduced-transparency: reduce) {
-  .material-bar {
-    background: var(--surface);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-@media (prefers-contrast: more) {
-  .material-bar {
-    background: var(--surface);
-    box-shadow: 0 -1px 0 var(--label-secondary);
-  }
 }
 
 /* ---------------------------------------------------------------------------

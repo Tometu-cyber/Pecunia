@@ -117,7 +117,7 @@ export function RecurrencesManager({
                           aria-label={done ? "Repasser en prévue" : "Marquer comme réalisée"}
                           className={clsx(
                             // case ronde façon Rappels : 28 px visibles, 44 px de zone tactile sur mobile
-                            "relative flex size-7 shrink-0 items-center justify-center rounded-full border-2 transition-colors before:absolute before:-inset-2 before:content-[''] md:size-6 md:before:hidden",
+                            "relative flex size-7 shrink-0 items-center justify-center rounded-full border-2 transition-colors before:absolute before:-inset-2.5 before:content-[''] md:size-6 md:before:hidden",
                             done ? "border-finances bg-finances text-on-finances" : "border-gray-2 text-transparent hover:border-finances hover:text-finances-text",
                           )}
                         >

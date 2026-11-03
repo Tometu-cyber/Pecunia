@@ -538,12 +538,12 @@ export function QuickEntryForm({
             isSheet ? "min-h-[52px] w-full px-6 text-[17px] tracking-[-0.43px]" : "min-h-11 px-5 text-[17px] md:min-h-7 md:px-3 md:text-[13px]",
           )}
         >
-          <span className="flex items-center gap-2">
+          <span className="flex items-center gap-2 whitespace-nowrap">
             {pending && <Spinner size={isSheet ? 18 : 15} />}
             {pending ? "Enregistrement…" : "Valider et continuer"}
           </span>
           {isSheet ? (
-            <span className="text-[15px] font-normal tracking-[-0.23px]">date conservée</span>
+            <span className="text-[13px] font-normal whitespace-nowrap opacity-80">date conservée</span>
           ) : (
             <CornerDownLeft size={15} className="opacity-75" />
           )}

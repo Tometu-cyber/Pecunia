@@ -21,7 +21,7 @@ type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
  */
 export function buttonClass(variant: ButtonVariant = "secondary", extra?: string) {
   return clsx(
-    "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 text-[17px] leading-[22px] font-semibold tracking-[-0.43px] transition-[color,background-color,filter,transform] duration-150 ease-out motion-safe:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 md:min-h-7 md:gap-1.5 md:px-3 md:text-[13px] md:leading-4 md:tracking-[-0.08px]",
+    "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 [&>svg]:shrink-0 text-[17px] leading-[22px] font-semibold tracking-[-0.43px] transition-[color,background-color,filter,transform] duration-150 ease-out motion-safe:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 md:min-h-7 md:gap-1.5 md:px-3 md:text-[13px] md:leading-4 md:tracking-[-0.08px]",
     variant === "primary" && "bg-finances text-on-finances hover:brightness-105",
     variant === "secondary" && "bg-fill-secondary text-label hover:brightness-95",
     variant === "ghost" && "px-3 text-finances-text hover:bg-fill-tertiary md:px-2",
@@ -165,7 +165,7 @@ export function Segmented<T extends string>({
       label={label}
       size={size === "sm" ? "small" : "regular"}
       full={className?.includes("w-full")}
-      className={className}
+      className={clsx(size === "md" && "pt-seg-auto", className)}
       items={options.map((o) => ({ id: o.value, label: o.label }))}
     />
   );
