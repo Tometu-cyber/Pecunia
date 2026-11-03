@@ -18,15 +18,15 @@ export function GoalCard({ status, onClick }: { status: GoalStatus; onClick?: ()
   const g = status.goal;
   const account = accountById.get(g.accountId);
   return (
-    <button type="button" onClick={onClick} className="w-full rounded-card bg-surface p-4 text-left shadow-card transition-shadow hover:shadow-pop">
+    <button type="button" onClick={onClick} className="w-full rounded-lg bg-bg-grouped-secondary p-4 text-left shadow-card transition-shadow hover:shadow-popover">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <span className="flex size-9 items-center justify-center rounded-[10px] bg-n-100 text-n-700">
+          <span className="flex size-9 items-center justify-center rounded-[10px] bg-fill-tertiary text-label-secondary">
             <Flag size={16} />
           </span>
           <div>
             <p className="font-bold">{g.name}</p>
-            <p className="flex items-center gap-1 text-[11px] text-n-600">
+            <p className="flex items-center gap-1 text-foot text-label-secondary">
               <span className="size-1.5 rounded-full" style={{ backgroundColor: account?.color }} />
               {account?.name} · avant le {numericDate(g.targetDate)}
             </p>
@@ -34,8 +34,8 @@ export function GoalCard({ status, onClick }: { status: GoalStatus; onClick?: ()
         </div>
         <span
           className={clsx(
-            "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold",
-            status.onTrack ? "bg-accent-100 text-accent-700" : "bg-warn-100 text-warn-800",
+            "shrink-0 rounded-full px-2 py-0.5 text-foot font-bold",
+            status.onTrack ? "bg-finances-bg text-finances-text" : "bg-warning/15 text-label",
           )}
         >
           {status.remainingCents === 0 ? "Atteint" : status.onTrack ? "En avance" : "En retard"}
@@ -43,15 +43,15 @@ export function GoalCard({ status, onClick }: { status: GoalStatus; onClick?: ()
       </div>
       <div className="mt-3 flex items-baseline justify-between">
         <p>
-          <span className="text-xl font-extrabold tabular-nums">{formatCents(status.currentCents)}</span>
-          <span className="text-xs text-n-600"> / {formatCents(g.targetCents)}</span>
+          <span className="text-heading font-bold tabular-nums">{formatCents(status.currentCents)}</span>
+          <span className="text-foot text-label-secondary"> / {formatCents(g.targetCents)}</span>
         </p>
-        <span className={clsx("text-sm font-bold", status.onTrack ? "text-accent-700" : "text-warn-800")}>{formatPercent(status.progress, 0)}</span>
+        <span className={clsx("text-body font-bold", status.onTrack ? "text-finances-text" : "text-label")}>{formatPercent(status.progress, 0)}</span>
       </div>
-      <div className="mt-2 h-2 overflow-hidden rounded-full bg-n-200">
-        <div className={clsx("h-full rounded-full", status.onTrack ? "bg-accent" : "bg-warn")} style={{ width: `${status.progress * 100}%` }} />
+      <div className="mt-2 h-2 overflow-hidden rounded-full bg-fill-secondary">
+        <div className={clsx("h-full rounded-full", status.onTrack ? "bg-finances" : "bg-warning")} style={{ width: `${status.progress * 100}%` }} />
       </div>
-      <p className="mt-2 text-[11px] text-n-600">
+      <p className="mt-2 text-foot text-label-secondary">
         {status.remainingCents === 0
           ? "Objectif atteint."
           : `Reste ${formatCents(status.remainingCents)} · ${formatCents(status.neededPerMonthCents)}/mois nécessaires, ${formatCents(Math.max(0, status.plannedPerMonthCents))}/mois programmés`}
@@ -151,7 +151,7 @@ export function GoalFormModal({ goal, onClose, defaultAccountId }: { goal: Goal 
             <Input id="goal-date" type="date" min={todayIso()} value={targetDate} onChange={(e) => setTargetDate(e.target.value)} />
           </div>
         </div>
-        <p className="text-xs text-n-600">
+        <p className="text-foot text-label-secondary">
           La progression suit le solde du compte. Le statut compare le montant nécessaire par mois aux virements récurrents programmés
           vers ce compte (écran Récurrences).
         </p>
@@ -167,13 +167,13 @@ export function GoalsSection({ statuses }: { statuses: GoalStatus[] }) {
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-extrabold">Objectifs d&apos;épargne</h2>
+        <h2 className="text-heading font-bold">Objectifs d&apos;épargne</h2>
         <Button onClick={() => setEditing({ goal: null, key: Date.now() })}>
           <Plus size={15} /> Nouvel objectif
         </Button>
       </div>
       {statuses.length === 0 ? (
-        <p className="rounded-xl bg-n-100 p-4 text-sm text-n-700">
+        <p className="rounded-xl bg-fill-tertiary p-4 text-body text-label-secondary">
           Aucun objectif. Fixe un montant et une date (voyage, fonds d&apos;urgence…) pour suivre ta progression.
         </p>
       ) : (

@@ -9,7 +9,8 @@ import { buildOccurrences, occurrenceWindow, signedRecurrenceCents } from "@/lib
 import { formatCents, formatCentsCompact } from "@/lib/domain/money";
 import { AccountChips } from "@/components/app/filters";
 import { ForecastChart } from "@/components/charts/charts";
-import { Banner, Card } from "@/components/ui/primitives";
+import { Banner, Card, PageHeader } from "@/components/ui/primitives";
+import { AccountFilter } from "@/components/app/account-filter";
 import { MonthPlanner, type PlanLine } from "./month-planner";
 
 export const metadata = { title: "Prévisionnel" };
@@ -129,40 +130,32 @@ export default async function ForecastPage({ searchParams }: { searchParams: Pro
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 pr-12 lg:pr-0">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-n-600">Anticipation</p>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-3xl font-extrabold md:text-4xl">Prévisionnel</h1>
-          <div role="radiogroup" aria-label="Horizon" className="inline-flex gap-0.5 rounded-[10px] bg-n-200 p-[3px]">
-            {HORIZONS.map((h) => (
-              <Link
-                key={h}
-                role="radio"
-                aria-checked={h === horizon}
-                href={withParams("/prevision", { horizon: h === 3 ? null : String(h), compte: accountId })}
-                className={clsx(
-                  "flex min-h-10 items-center rounded-lg px-3 text-sm font-semibold md:min-h-8",
-                  h === horizon ? "bg-surface text-text shadow-card" : "text-n-700 hover:text-text",
-                )}
-              >
-                {h} mois
-              </Link>
-            ))}
-          </div>
-        </div>
+      <PageHeader kicker="Anticipation" title="Prévisionnel" />
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <AccountFilter
+          label="Horizon"
+          value={String(horizon)}
+          full
+          options={HORIZONS.map((h) => ({
+            id: String(h),
+            label: `${h} mois`,
+            href: withParams("/prevision", { horizon: h === 3 ? null : String(h), compte: accountId }),
+          }))}
+        />
         <AccountChips
           path="/prevision"
           accounts={active}
           selected={accountId}
           params={{ horizon: params.horizon, mois: params.mois }}
           allLabel="Tous comptes"
+          full
         />
       </div>
 
       {visibleAlerts.map((a) => (
         <Banner key={a.accountId} tone="danger">
           <span className="inline-flex items-center gap-2">
-            <TriangleAlert size={15} />
+            <TriangleAlert size={18} strokeWidth={1.75} className="shrink-0" aria-hidden />
             <span>
               <strong>{accountName.get(a.accountId)}</strong> en négatif en {monthName(a.month)} · {formatCents(a.balanceCents)} projetés.
               Prévois un virement.
@@ -172,15 +165,15 @@ export default async function ForecastPage({ searchParams }: { searchParams: Pro
       ))}
 
       <Card>
-        <h2 className="mb-2 text-[11px] font-bold uppercase tracking-wider text-n-700">Solde projeté en fin de mois</h2>
+        <h2 className="mb-3 text-heading">Solde projeté en fin de mois</h2>
         <ForecastChart data={chartData} series={shown.map((a) => ({ key: a.id, name: a.name, color: a.color }))} />
-        <p className="mt-2 text-[11px] text-n-600">
+        <p className="mt-2 text-foot text-label-secondary">
           Solde actuel + échéances des récurrences (retenues d&apos;office, sauf refus) + budgets acceptés + entrées / sorties prévues.
           Les budgets à valider ne sont pas comptés.
         </p>
       </Card>
 
-      <nav aria-label="Mois" className="no-scrollbar -mx-4 -mt-2 flex gap-2 overflow-x-auto px-4 pt-2 md:mx-0 md:pl-0 md:pr-2">
+      <nav aria-label="Mois" className="no-scrollbar -mx-4 -mt-2 flex gap-2 overflow-x-auto px-4 pt-2 pb-1 md:mx-0 md:pl-0 md:pr-2">
         {months.map((m, i) => {
           const end = sumShown((id) => m.perAccount[id]!.endBalanceCents);
           const pending = m.proposals.filter((p) => p.status === "pending" && touches(proposalEffects(p))).length;
@@ -191,14 +184,14 @@ export default async function ForecastPage({ searchParams }: { searchParams: Pro
               href={withParams("/prevision", { horizon: horizon === 3 ? null : String(horizon), compte: accountId, mois: i === 0 ? null : m.month })}
               aria-current={i === selectedIndex ? "page" : undefined}
               className={clsx(
-                "relative flex min-w-24 shrink-0 flex-col rounded-xl border px-3 py-2 text-left",
-                i === selectedIndex ? "border-accent bg-accent-100" : "border-n-300 bg-surface hover:bg-n-100",
+                "relative flex min-w-24 shrink-0 flex-col rounded-md px-3 py-2 text-left shadow-card transition-transform motion-safe:active:scale-[0.97]",
+                i === selectedIndex ? "bg-finances-bg text-finances-text" : "bg-bg-grouped-secondary hover:bg-fill-tertiary",
               )}
             >
-              <span className="text-xs font-bold capitalize">{monthAbbr(m.month)}</span>
-              <span className={clsx("text-sm font-extrabold tabular-nums", negative && "text-danger-700")}>{formatCentsCompact(end)}</span>
+              <span className="text-foot font-semibold capitalize">{monthAbbr(m.month)}</span>
+              <span className={clsx("font-rounded text-[17px] leading-[22px] font-bold tabular-nums md:text-[15px] md:leading-5", negative && "text-danger-text")}>{formatCentsCompact(end)}</span>
               {pending > 0 && (
-                <span className="absolute -right-1.5 -top-1.5 grid min-w-5 place-items-center rounded-full bg-warn px-1 text-[10px] font-bold text-on-warn">
+                <span className="absolute -right-1.5 -top-1.5 grid min-w-5 place-items-center rounded-full bg-warning px-1 text-foot font-bold text-black">
                   {pending}
                 </span>
               )}

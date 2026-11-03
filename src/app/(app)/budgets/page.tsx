@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { getAppData, getBudgets } from "@/lib/data/queries";
 import { getBudgetOverview, resolveMonth } from "@/lib/data/views";
 import { budgetAccountIds } from "@/lib/domain/budgets";
@@ -6,7 +7,7 @@ import { formatCents, formatPercent } from "@/lib/domain/money";
 import { shortAccountName } from "@/lib/domain/accounts";
 import { MonthSwitcher } from "@/components/app/filters";
 import { IconBadge } from "@/components/ui/icons";
-import { Banner, Card, EmptyState, ProgressBar, statusText } from "@/components/ui/primitives";
+import { Banner, Card, EmptyState, PageHeader, ProgressBar, statusText } from "@/components/ui/primitives";
 import { BudgetEditButton, BudgetSettings } from "./budget-controls";
 
 export const metadata = { title: "Budgets" };
@@ -21,25 +22,23 @@ export default async function BudgetsPage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2 pr-12 lg:pr-0">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-n-600">Budgets</p>
-        <MonthSwitcher path="/budgets" month={month} current={current} />
-      </div>
+      <PageHeader kicker="Mois budgétaire" title="Budgets" />
+      <MonthSwitcher path="/budgets" month={month} current={current} />
 
       {overview.alerts.length > 0 && (
-        <Banner tone="warn" action={<Link href="/" className="font-bold">Tableau de bord</Link>}>
+        <Banner tone="warn" action={<Link href="/" className="font-semibold text-finances-text">Tableau de bord</Link>}>
           {overview.alerts.length} catégorie{overview.alerts.length > 1 ? "s" : ""} au-delà de 80 % du budget.
         </Banner>
       )}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <Card>
-          <p className="text-sm font-semibold text-n-700">Reste à dépenser</p>
-          <p className={`text-4xl font-extrabold tabular-nums ${overview.remainingCents < 0 ? "text-danger-700" : "text-accent-700"}`}>
+          <p className="text-sub font-semibold text-label-secondary">Reste à dépenser</p>
+          <p className={`text-stat-hero font-bold tabular-nums ${overview.remainingCents < 0 ? "text-danger-text" : "text-finances-text"}`}>
             {formatCents(overview.remainingCents)}
           </p>
           <ProgressBar ratio={overview.ratio} status={overview.status} className="mt-3" />
-          <p className="mt-1.5 text-xs text-n-600">
+          <p className="mt-1.5 text-foot text-label-secondary">
             {formatCents(overview.totalSpentCents)} sur {formatCents(overview.totalBudgetCents)} · {formatPercent(overview.ratio, 0)} -
             dépenses réelles uniquement
           </p>
@@ -59,7 +58,7 @@ export default async function BudgetsPage({ searchParams }: { searchParams: Prom
             <EmptyState>Aucun budget défini. Choisis une catégorie ci-dessous pour en créer un.</EmptyState>
           </div>
         ) : (
-          <ul className="divide-y divide-divider">
+          <ul className="pt-list-inset">
             {overview.lines.map((l) => {
               const accountNames = [...budgetAccountIds(l.category, accounts)]
                 .map((id) => accountById.get(id))
@@ -78,19 +77,19 @@ export default async function BudgetsPage({ searchParams }: { searchParams: Prom
                       <IconBadge icon={l.category.icon} color={l.category.color} />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="font-bold">{l.category.name}</p>
-                          <p className={`text-sm font-bold ${statusText[l.status]}`}>{formatPercent(Math.min(l.ratio, 9.99), 0)}</p>
+                          <p className="truncate text-body">{l.category.name}</p>
+                          <p className={`text-body font-semibold tabular-nums ${statusText[l.status]}`}>{formatPercent(Math.min(l.ratio, 9.99), 0)}</p>
                         </div>
-                        <p className="text-[11px] text-n-600">
+                        <p className="text-sub text-label-secondary">
                           {accountNames.join(" + ")}
                           {l.budget.mode === "percent" && ` · ${String(l.budget.percent).replace(".", ",")} % du revenu`}
                         </p>
                         <ProgressBar ratio={l.ratio} status={l.status} className="mt-2" />
-                        <div className="mt-1 flex justify-between text-[11px]">
-                          <span className={l.remainingCents < 0 ? "font-bold text-danger-700" : "text-n-600"}>
+                        <div className="mt-1 flex justify-between text-foot">
+                          <span className={l.remainingCents < 0 ? "font-semibold text-danger-text" : "text-label-secondary"}>
                             {l.remainingCents < 0 ? `Dépassé de ${formatCents(-l.remainingCents)}` : `Reste ${formatCents(l.remainingCents)}`}
                           </span>
-                          <span className="text-n-600 tabular-nums">
+                          <span className="text-label-secondary tabular-nums">
                             {formatCents(l.spentCents)} / {formatCents(l.budgetCents)}
                           </span>
                         </div>
@@ -106,7 +105,7 @@ export default async function BudgetsPage({ searchParams }: { searchParams: Prom
 
       {unbudgeted.length > 0 && (
         <Card>
-          <h2 className="mb-2 text-[11px] font-bold uppercase tracking-wider text-n-700">Catégories sans budget</h2>
+          <h2 className="mb-3 text-heading">Catégories sans budget</h2>
           <ul className="flex flex-wrap gap-2">
             {unbudgeted.map((c) => (
               <li key={c.id}>
@@ -120,7 +119,7 @@ export default async function BudgetsPage({ searchParams }: { searchParams: Prom
                 >
                   <span className="flex items-center gap-2">
                     <span className="size-2 rounded-full" style={{ backgroundColor: c.color }} />
-                    {c.name} <span className="text-accent-700">+</span>
+                    {c.name} <Plus size={15} strokeWidth={2.2} className="text-finances-text" aria-hidden />
                   </span>
                 </BudgetEditButton>
               </li>

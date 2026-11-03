@@ -9,7 +9,7 @@ import { sanitizeAmountInput } from "@/lib/domain/money";
 import type { ExistingLine } from "@/lib/domain/csv-import";
 import type { Account, Category } from "@/lib/domain/types";
 
-const cell = "h-9 w-full rounded-lg border border-transparent bg-transparent px-2 text-sm hover:border-n-300 focus:border-accent focus:bg-surface focus:outline-none";
+const cell = "h-9 w-full rounded-lg border border-transparent bg-transparent px-2 text-body hover:border-separator-opaque focus:border-finances focus:bg-bg-grouped-secondary focus:outline-none";
 
 export interface RowActions {
   update: (key: string, patch: Partial<DraftRow>) => void;
@@ -43,9 +43,9 @@ export const ImportRowView = memo(function ImportRowView({
   return (
     <tr
       className={clsx(
-        "border-b border-divider align-middle",
+        "border-b border-separator align-middle",
         !row.include && "opacity-45",
-        row.include && problem && "bg-danger-100/50",
+        row.include && problem && "bg-danger/12",
       )}
     >
       <td className="px-2">
@@ -95,7 +95,7 @@ export const ImportRowView = memo(function ImportRowView({
             ))}
           </select>
         ) : row.type === "interest" ? (
-          <span className="px-2 text-xs text-n-600">Revenu d&apos;épargne</span>
+          <span className="px-2 text-foot text-label-secondary">Revenu d&apos;épargne</span>
         ) : (
           <select
             value={row.categoryId ?? ""}
@@ -114,7 +114,7 @@ export const ImportRowView = memo(function ImportRowView({
       </td>
       <td className="w-32">
         <div className="flex items-center">
-          <span className={clsx("w-3 text-sm font-bold", outflow ? "text-n-600" : "text-accent-700")}>{outflow ? "−" : "+"}</span>
+          <span className={clsx("w-3 text-body font-bold", outflow ? "text-label-secondary" : "text-finances-text")}>{outflow ? "−" : "+"}</span>
           <input
             inputMode="decimal"
             value={row.amount}
@@ -125,29 +125,29 @@ export const ImportRowView = memo(function ImportRowView({
           />
         </div>
       </td>
-      <td className="w-44 px-2 text-xs">
+      <td className="w-44 px-2 text-foot">
         {row.existing ? (
-          <span className="rounded-full bg-n-200 px-2 py-0.5 font-semibold text-n-700" title={row.existing.place ?? undefined}>
+          <span className="rounded-full bg-fill-secondary px-2 py-0.5 font-semibold text-label-secondary" title={row.existing.place ?? undefined}>
             Déjà présente ({numericDate(row.existing.date).slice(0, 5)})
           </span>
         ) : row.include && problem ? (
-          <span className="font-semibold text-danger-700">{problem}</span>
+          <span className="font-semibold text-danger-text">{problem}</span>
         ) : row.include && link ? (
           <span
-            className="rounded-full bg-accent-100 px-2 py-0.5 font-semibold text-accent-700"
+            className="rounded-full bg-finances-bg px-2 py-0.5 font-semibold text-finances-text"
             title={`« ${link.place ?? ""} » du ${numericDate(link.date)} sur ${linkAccountName} sera converti en virement`}
           >
             Relié ({linkAccountName})
           </span>
         ) : row.line === null ? (
-          <span className="text-n-600">Ajoutée</span>
+          <span className="text-label-secondary">Ajoutée</span>
         ) : null}
       </td>
       <td className="px-1">
         <button
           type="button"
           onClick={() => actions.remove(row.key)}
-          className="flex size-8 items-center justify-center rounded-lg text-n-600 hover:bg-danger-100 hover:text-danger-700"
+          className="flex size-8 items-center justify-center rounded-lg text-label-secondary hover:bg-danger/12 hover:text-danger-text"
           aria-label="Supprimer la ligne"
         >
           <Trash2 size={15} />

@@ -1,5 +1,6 @@
 "use client";
 
+import { Toggle } from "@/components/ui/toggle";
 import { clsx } from "clsx";
 import { useState, useTransition, type ReactNode } from "react";
 import { saveBudget, updateProfile } from "@/lib/data/actions";
@@ -59,7 +60,9 @@ export function BudgetEditButton({
         onClick={() => setOpen(true)}
         className={clsx(
           "w-full text-left",
-          compact ? "min-h-10 rounded-full border border-n-300 px-3.5 text-sm font-semibold hover:bg-n-100" : "px-4 py-3.5 hover:bg-n-100",
+          compact
+            ? "min-h-11 rounded-full bg-fill-tertiary px-4 text-[15px] tracking-[-0.23px] hover:bg-fill-secondary md:min-h-7 md:px-3 md:text-[13px]"
+            : "px-4 py-3 hover:bg-fill-tertiary active:bg-fill-secondary",
         )}
       >
         {children}
@@ -95,12 +98,12 @@ export function BudgetEditButton({
             <Label htmlFor="budget-value">{mode === "fixed" ? "Montant mensuel (€)" : "Pourcentage du revenu de référence"}</Label>
             <Input id="budget-value" inputMode="decimal" value={value} onChange={(e) => setValue(sanitizeAmountInput(e.target.value))} />
             {preview !== null && (
-              <p className="mt-1.5 text-xs text-n-600">
+              <p className="mt-1.5 text-foot text-label-secondary">
                 Soit {formatCents(preview)} / mois sur un revenu de {formatCents(referenceIncomeCents)}.
               </p>
             )}
           </div>
-          <p className="text-xs text-n-600">
+          <p className="text-foot text-label-secondary">
             S&apos;applique dès le mois en cours. Les comptes concernés se règlent dans l&apos;écran Catégories.
           </p>
           <FieldError>{error}</FieldError>
@@ -128,23 +131,23 @@ export function BudgetSettings({
 
   return (
     <div className="flex flex-col gap-4">
-      <label className="flex items-start justify-between gap-3 text-sm">
+      <div className="flex items-center justify-between gap-3 text-body">
         <span>
-          <span className="block font-semibold">Reporter le reste</span>
-          <span className="text-xs text-n-600">
+          <span id="carry-label" className="block">Reporter le reste</span>
+          <span className="text-sub text-label-secondary">
             {carryOver ? `${formatCents(carryOverCents)} reportés du mois précédent` : "Ajoute le reliquat du mois précédent"}
           </span>
         </span>
         <span className="flex items-center gap-2">
           {pending && what === "carry" && <Spinner size={14} label="Enregistrement" />}
-          <input
-            type="checkbox"
+          <Toggle
+            ariaLabel="Reporter le reste"
             checked={carryOver}
             disabled={pending}
-            onChange={(e) => {
+            onChange={(on) => {
               setWhat("carry");
               startTransition(async () => {
-                const r = await updateProfile({ budgetCarryOver: e.target.checked });
+                const r = await updateProfile({ budgetCarryOver: on });
                 startTransition(() => {
                   if (!r.ok) toast(r.error, "error");
                 });
@@ -152,9 +155,9 @@ export function BudgetSettings({
             }}
           />
         </span>
-      </label>
+      </div>
       <form
-        className="border-t border-divider pt-3"
+        className="border-t-[0.5px] border-separator pt-3"
         onSubmit={(e) => {
           e.preventDefault();
           setError(null);

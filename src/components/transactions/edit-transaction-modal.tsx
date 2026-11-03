@@ -123,7 +123,7 @@ export function EditTransactionModal({
       }
     >
       {isAdjust ? (
-        <p className="text-sm text-n-700">
+        <p className="text-body text-label-secondary">
           Ligne technique créée lors d&apos;un ajustement de solde. Elle ne peut pas être modifiée ; supprime-la puis ajuste à
           nouveau le solde si besoin.
         </p>

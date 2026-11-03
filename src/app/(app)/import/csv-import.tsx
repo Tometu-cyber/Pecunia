@@ -325,16 +325,16 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
               Tableau vide
             </Button>
             {file && (
-              <span className="text-xs text-n-600">
+              <span className="text-foot text-label-secondary">
                 {file.name} · {file.parsed.rows.length} lignes · séparateur « {file.parsed.separator === "\t" ? "tab" : file.parsed.separator} » ·{" "}
                 {file.encoding}
               </span>
             )}
           </div>
         </div>
-        {loadError && <p className="mt-3 text-sm font-semibold text-danger-700">{loadError}</p>}
+        {loadError && <p className="mt-3 text-body font-semibold text-danger-text">{loadError}</p>}
         {!file && !drafts && (
-          <p className="mt-3 text-xs text-n-600">
+          <p className="mt-3 text-foot text-label-secondary">
             Un fichier par compte, par exemple <code>Raison;Date;Recette;Depense;Total</code>. Les virements vers tes autres comptes
             sont reconnus par leur nom dans le libellé, et les lignes déjà enregistrées sont repérées pour éviter les doublons.
           </p>
@@ -344,13 +344,13 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
       {/* Étape 2 : correspondance des colonnes */}
       {file && (
         <Card>
-          <h2 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-n-700">Correspondance des colonnes</h2>
+          <h2 className="mb-3 text-foot font-bold text-label-secondary">Correspondance des colonnes</h2>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {file.parsed.header.map((h, i) => (
               <div key={i}>
                 <Label htmlFor={`col-${i}`}>
                   {h || `Colonne ${i + 1}`}{" "}
-                  <span className="text-n-600">· {file.parsed.rows[0]?.cells[i] || "-"}</span>
+                  <span className="text-label-secondary">· {file.parsed.rows[0]?.cells[i] || "-"}</span>
                 </Label>
                 <Select id={`col-${i}`} value={file.roles[i]} onChange={(e) => changeRole(i, e.target.value as ColumnRole)}>
                   {(Object.keys(COLUMN_ROLE_LABELS) as ColumnRole[]).map((r) => (
@@ -363,12 +363,12 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
             ))}
           </div>
           {columnsProblem(file.roles) ? (
-            <p className="mt-3 text-sm font-semibold text-danger-700">{columnsProblem(file.roles)}</p>
+            <p className="mt-3 text-body font-semibold text-danger-text">{columnsProblem(file.roles)}</p>
           ) : (
-            <p className="mt-3 text-xs text-n-600">Modifier la correspondance recharge le tableau (les modifications faites dans le tableau sont perdues).</p>
+            <p className="mt-3 text-foot text-label-secondary">Modifier la correspondance recharge le tableau (les modifications faites dans le tableau sont perdues).</p>
           )}
           {file.errors.length > 0 && (
-            <details className="mt-3 text-xs text-warn-800">
+            <details className="mt-3 text-foot text-label">
               <summary className="cursor-pointer font-semibold">
                 {file.errors.length} ligne{file.errors.length > 1 ? "s" : ""} illisible{file.errors.length > 1 ? "s" : ""} ignorée
                 {file.errors.length > 1 ? "s" : ""}
@@ -388,19 +388,19 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
       {/* Étape 3 : tableau modifiable */}
       {pending && !drafts && (
         <Card>
-          <p className="flex items-center gap-2 text-sm text-n-700">
+          <p className="flex items-center gap-2 text-body text-label-secondary">
             <Spinner /> Lecture du fichier et recherche des lignes déjà enregistrées…
           </p>
         </Card>
       )}
       {pending && drafts && !submitting && (
-        <p className="flex items-center gap-2 text-sm text-n-700">
+        <p className="flex items-center gap-2 text-body text-label-secondary">
           <Spinner /> Mise à jour du tableau…
         </p>
       )}
       {drafts && account && (
         <Card className="!p-0">
-          <div className="flex flex-col gap-3 border-b border-divider p-4">
+          <div className="flex flex-col gap-3 border-b border-separator p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
                 {(
@@ -423,14 +423,14 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Rechercher un libellé"
-                  className="min-h-9 rounded-[10px] border border-n-300 bg-surface px-3 text-sm focus:border-accent focus:outline-none"
+                  className="min-h-9 rounded-[10px] border border-separator-opaque bg-bg-grouped-secondary px-3 text-body focus:border-finances focus:outline-none"
                 />
                 <Button onClick={addRow}>
                   <Plus size={15} /> Ajouter une ligne
                 </Button>
               </div>
             </div>
-            <p className="text-xs text-n-600">
+            <p className="text-foot text-label-secondary">
               Changer la catégorie d&apos;une ligne l&apos;applique aux autres lignes de même libellé. Les lignes « Déjà présentes »
               existent déjà sur ce compte (par exemple un virement créé lors de l&apos;import de l&apos;autre compte) : elles sont exclues.
               Un virement « Relié » correspond à une entrée ou sortie déjà saisie sur l&apos;autre compte : elle sera convertie en
@@ -440,7 +440,7 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
 
           <div className="max-h-[60vh] overflow-auto">
             <table className="w-full min-w-[980px] text-left">
-              <thead className="sticky top-0 z-10 bg-surface text-[11px] font-bold uppercase tracking-wider text-n-600 shadow-[0_1px_0_var(--divider)]">
+              <thead className="sticky top-0 z-10 bg-bg-grouped-secondary text-foot font-bold text-label-secondary shadow-[0_1px_0_var(--divider)]">
                 <tr>
                   <th className="w-8 px-2 py-2">
                     <input
@@ -478,46 +478,46 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
                 ))}
               </tbody>
             </table>
-            {visible.length === 0 && <p className="p-6 text-center text-sm text-n-600">Aucune ligne dans ce filtre.</p>}
+            {visible.length === 0 && <p className="p-6 text-center text-body text-label-secondary">Aucune ligne dans ce filtre.</p>}
           </div>
 
           {/* Pied : récapitulatif, solde et validation */}
-          <div className="flex flex-col gap-3 border-t border-divider p-4">
+          <div className="flex flex-col gap-3 border-t border-separator p-4">
             {file?.opening && (
-              <label className="flex items-start gap-2 text-sm">
+              <label className="flex items-start gap-2 text-body">
                 <input type="checkbox" checked={setOpening} onChange={(e) => setSetOpening(e.target.checked)} className="mt-0.5" />
                 <span>
                   Définir le solde initial de <strong>{account.name}</strong> à <strong>{formatCents(file.opening.cents)}</strong> au{" "}
-                  {numericDate(file.opening.date)} <span className="text-n-600">(déduit de la colonne « Total »)</span>
+                  {numericDate(file.opening.date)} <span className="text-label-secondary">(déduit de la colonne « Total »)</span>
                   {account.initialBalanceCents !== 0 && (
-                    <span className="block text-xs text-warn-800">Remplace le solde initial actuel ({formatCents(account.initialBalanceCents)}).</span>
+                    <span className="block text-foot text-label">Remplace le solde initial actuel ({formatCents(account.initialBalanceCents)}).</span>
                   )}
                 </span>
               </label>
             )}
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="text-sm">
+              <div className="text-body">
                 <p>
                   <strong>{summary.valid.length}</strong> ligne{summary.valid.length > 1 ? "s" : ""} validée{summary.valid.length > 1 ? "s" : ""} ·
                   dépenses <strong>{formatCents(summary.expenses)}</strong> · entrées <strong>{formatCents(summary.income)}</strong> ·{" "}
                   {summary.transfers} virement{summary.transfers > 1 ? "s" : ""}
                 </p>
-                <p className="mt-0.5 text-xs text-n-600">
-                  Solde de {account.name} après import : <strong className="text-text">{formatCents(projected ?? 0)}</strong>
+                <p className="mt-0.5 text-foot text-label-secondary">
+                  Solde de {account.name} après import : <strong className="text-label">{formatCents(projected ?? 0)}</strong>
                   {file?.closingFromFile !== null && file?.closingFromFile !== undefined && (
                     <>
                       {" "}
                       · total du fichier {formatCents(file.closingFromFile)}{" "}
                       {projected === file.closingFromFile ? (
-                        <span className="font-bold text-accent-700">✓ identique</span>
+                        <span className="font-bold text-finances-text">✓ identique</span>
                       ) : (
-                        <span className="font-bold text-warn-800">écart de {formatCents((projected ?? 0) - file.closingFromFile, "always")}</span>
+                        <span className="font-bold text-label">écart de {formatCents((projected ?? 0) - file.closingFromFile, "always")}</span>
                       )}
                     </>
                   )}
                 </p>
                 {summary.invalid > 0 && (
-                  <p className="mt-0.5 flex items-center gap-1 text-xs font-semibold text-danger-700">
+                  <p className="mt-0.5 flex items-center gap-1 text-foot font-semibold text-danger-text">
                     <TriangleAlert size={13} /> {summary.invalid} ligne{summary.invalid > 1 ? "s" : ""} incomplète
                     {summary.invalid > 1 ? "s" : ""} ne ser{summary.invalid > 1 ? "ont" : "a"} pas importée{summary.invalid > 1 ? "s" : ""}
                   </p>
@@ -533,9 +533,9 @@ export function CsvImport({ initialAccountId }: { initialAccountId: string | nul
                 {submitting ? "Import en cours…" : `Valider le bloc · ${summary.valid.length} transaction${summary.valid.length > 1 ? "s" : ""}`}
               </Button>
             </div>
-            {submitError && <p className="text-sm font-semibold text-danger-700">{submitError}</p>}
+            {submitError && <p className="text-body font-semibold text-danger-text">{submitError}</p>}
             {summary.review > 0 && (
-              <p className="text-xs text-n-600">
+              <p className="text-foot text-label-secondary">
                 {summary.review} ligne{summary.review > 1 ? "s" : ""} en « {autresId ? categoryById.get(autresId)?.name : "Autres"} » : filtre « À vérifier »
                 pour les recatégoriser.
               </p>

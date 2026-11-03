@@ -620,3 +620,11 @@ a.pt-btn-gray { color: var(--label); }
 @media (prefers-reduced-motion: reduce) {
   .pt-tab-pill, .pt-tabbar.is-dragging .pt-tab-pill { transition: none; scale: 1; }
 }
+
+/* Liste groupée « libre » (lignes qui ne sont pas des ListRow : glisser pour supprimer…) :
+   séparateurs de 0,5 px qui commencent au niveau du texte, comme ListRow. */
+.pt-list-inset > li + li { position: relative; }
+.pt-list-inset > li + li::before {
+  content: ""; position: absolute; z-index: 1; top: 0; right: 0; left: var(--sep-inset, 58px);
+  border-top: 0.5px solid var(--separator); pointer-events: none;
+}

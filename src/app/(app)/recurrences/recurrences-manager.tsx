@@ -65,16 +65,16 @@ export function RecurrencesManager({
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card>
-          <p className="text-xs font-semibold text-n-700">Abonnements / mois</p>
-          <p className="mt-1 text-2xl font-extrabold tabular-nums">{formatCents(subscriptionsMonthlyCents)}</p>
-          <p className="text-[11px] text-n-600">
+          <p className="text-foot font-semibold text-label-secondary">Abonnements / mois</p>
+          <p className="mt-1 text-stat font-bold tabular-nums">{formatCents(subscriptionsMonthlyCents)}</p>
+          <p className="text-foot text-label-secondary">
             {subscriptionsCount} abonnement{subscriptionsCount > 1 ? "s" : ""} actif{subscriptionsCount > 1 ? "s" : ""}
           </p>
         </Card>
         <Card>
-          <p className="text-xs font-semibold text-n-700">Coût annuel</p>
-          <p className="mt-1 text-2xl font-extrabold tabular-nums">{formatCents(subscriptionsMonthlyCents * 12)}</p>
-          <p className="text-[11px] text-n-600">Abonnements × 12</p>
+          <p className="text-foot font-semibold text-label-secondary">Coût annuel</p>
+          <p className="mt-1 text-stat font-bold tabular-nums">{formatCents(subscriptionsMonthlyCents * 12)}</p>
+          <p className="text-foot text-label-secondary">Abonnements × 12</p>
         </Card>
         <Card className="flex items-center justify-center">
           <Button variant="primary" onClick={() => setEditing({ recurrence: null, key: Date.now() })}>
@@ -87,7 +87,7 @@ export function RecurrencesManager({
         <Card className="!p-0">
           <div className="p-4 pb-2">
             <CardHeader title="Échéances à venir" />
-            <p className="-mt-2 text-xs text-n-600">
+            <p className="-mt-2 text-foot text-label-secondary">
               ✓ = réalisée. Les échéances déjà saisies ou importées sont reconnues automatiquement (libellé et montant proches).
             </p>
           </div>
@@ -98,17 +98,17 @@ export function RecurrencesManager({
           ) : (
             [...byMonth.entries()].map(([month, list]) => (
               <section key={month}>
-                <h3 className="border-y border-divider bg-n-100 px-4 py-2 text-xs font-bold uppercase tracking-wider text-n-700">
+                <h3 className="border-y border-separator bg-fill-tertiary px-4 py-2 text-foot font-bold text-label-secondary">
                   {monthLabel(month)}
                 </h3>
-                <ul className="divide-y divide-divider">
+                <ul className="divide-y divide-separator">
                   {list.map((o) => {
                     const r = o.recurrence;
                     const done = o.status === "done";
                     const late = !done && o.date < today;
                     const category = r.categoryId ? categoryById.get(r.categoryId) : undefined;
                     return (
-                      <li key={o.key} className={clsx("flex items-center gap-3 px-4 py-2.5", done && "bg-n-100")}>
+                      <li key={o.key} className={clsx("flex items-center gap-3 px-4 py-2.5", done && "bg-fill-tertiary")}>
                         <button
                           type="button"
                           onClick={() => toggle(o)}
@@ -117,14 +117,14 @@ export function RecurrencesManager({
                           aria-label={done ? "Repasser en prévue" : "Marquer comme réalisée"}
                           className={clsx(
                             "flex size-9 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                            done ? "border-accent bg-accent text-on-accent" : "border-n-300 text-transparent hover:border-accent hover:text-accent",
+                            done ? "border-finances bg-finances text-on-finances" : "border-separator-opaque text-transparent hover:border-finances hover:text-finances-text",
                           )}
                         >
                           {busyKey === o.key ? <Spinner size={15} className="text-current" /> : <Check size={16} strokeWidth={3} />}
                         </button>
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-bold">{r.label}</p>
-                          <p className="truncate text-xs text-n-600">
+                          <p className="truncate text-foot text-label-secondary">
                             {shortDate(o.date)} · {accountLabel(r)}
                             {category && ` · ${category.name}`}
                             {done ? (o.matched ? " · réalisée (reconnue)" : " · réalisée") : late ? " · en retard" : " · prévue"}
@@ -145,9 +145,9 @@ export function RecurrencesManager({
             <CardHeader title={`Récurrences · ${recurrences.length}`} />
           </div>
           {recurrences.length === 0 ? (
-            <p className="px-4 pb-4 text-sm text-n-600">Aucune récurrence pour l&apos;instant.</p>
+            <p className="px-4 pb-4 text-body text-label-secondary">Aucune récurrence pour l&apos;instant.</p>
           ) : (
-            <ul className="divide-y divide-divider">
+            <ul className="divide-y divide-separator">
               {recurrences.map((r) => {
                 const category = r.categoryId ? categoryById.get(r.categoryId) : undefined;
                 return (
@@ -155,7 +155,7 @@ export function RecurrencesManager({
                     <button
                       type="button"
                       onClick={() => setEditing({ recurrence: r, key: Date.now() })}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-n-100"
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-fill-tertiary"
                     >
                       <IconBadge
                         icon={r.type === "transfer" ? "transfer" : (category?.icon ?? "repeat")}
@@ -163,19 +163,19 @@ export function RecurrencesManager({
                         size="sm"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="flex items-center gap-2 truncate text-sm font-bold">
+                        <p className="flex items-center gap-2 truncate text-body font-bold">
                           {r.label}
                           {r.isSubscription && (
-                            <span className="rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-bold text-accent-700">Abonnement</span>
+                            <span className="rounded-full bg-finances-bg px-2 py-0.5 text-foot font-bold text-finances-text">Abonnement</span>
                           )}
                         </p>
-                        <p className="truncate text-[11px] text-n-600">
+                        <p className="truncate text-foot text-label-secondary">
                           {FREQUENCY_LABELS[r.frequency]}
                           {r.frequency !== "weekly" && `, le ${r.dueDay}`} · {accountLabel(r)}
                           {r.endDate && ` · jusqu'au ${shortDate(r.endDate)}`}
                         </p>
                       </div>
-                      <span className="text-sm font-semibold tabular-nums">{formatCents(r.amountCents)}</span>
+                      <span className="text-body font-semibold tabular-nums">{formatCents(r.amountCents)}</span>
                     </button>
                   </li>
                 );

@@ -1,7 +1,8 @@
 "use client";
 
+import { GlassButton } from "@/components/ui/glass-button";
 import { clsx } from "clsx";
-import { Archive, Pencil, SlidersHorizontal } from "lucide-react";
+import { Archive, Pencil, SlidersHorizontal, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import {
@@ -45,7 +46,7 @@ export function IconColorPicker({
               onClick={() => onIcon(name)}
               aria-pressed={icon === name}
               aria-label={name}
-              className={clsx("rounded-xl p-0.5 ring-2", icon === name ? "ring-ink" : "ring-transparent")}
+              className={clsx("rounded-xl p-0.5 ring-2", icon === name ? "ring-label" : "ring-transparent")}
             >
               <IconBadge icon={name} color={color} />
             </button>
@@ -62,7 +63,7 @@ export function IconColorPicker({
               onClick={() => onColor(c)}
               aria-pressed={color === c}
               aria-label={`Couleur ${c}`}
-              className={clsx("size-8 rounded-full ring-2 ring-offset-2 ring-offset-surface", color === c ? "ring-ink" : "ring-transparent")}
+              className={clsx("size-8 rounded-full ring-2 ring-offset-2 ring-offset-bg-grouped-secondary", color === c ? "ring-label" : "ring-transparent")}
               style={{ backgroundColor: c }}
             />
           ))}
@@ -72,7 +73,8 @@ export function IconColorPicker({
   );
 }
 
-export function NewAccountButton() {
+/** Bouton « Nouveau compte » et sa modale ; `compact` : bouton rond en verre (en-tête mobile). */
+export function NewAccountButton({ compact = false }: { compact?: boolean }) {
   const toast = useToast();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -102,9 +104,13 @@ export function NewAccountButton() {
 
   return (
     <>
-      <Button variant="primary" onClick={() => setOpen(true)}>
-        + Nouveau compte
-      </Button>
+      {compact ? (
+        <GlassButton icon={Plus} label="Nouveau compte" onClick={() => setOpen(true)} />
+      ) : (
+        <GlassButton size="small" icon={Plus} prominent onClick={() => setOpen(true)}>
+          Nouveau compte
+        </GlassButton>
+      )}
       <Modal
         open={open}
         onClose={() => setOpen(false)}
@@ -226,8 +232,8 @@ export function AdjustBalanceButton({ account, balanceCents }: { account: Accoun
         }
       >
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between rounded-xl bg-n-100 px-3 py-2.5 text-sm">
-            <span className="text-n-700">Solde calculé par Pecunia</span>
+          <div className="flex items-center justify-between rounded-xl bg-fill-tertiary px-3 py-2.5 text-body">
+            <span className="text-label-secondary">Solde calculé par Pecunia</span>
             <strong className="tabular-nums">{formatCents(balanceCents)}</strong>
           </div>
           <div>
@@ -237,7 +243,7 @@ export function AdjustBalanceButton({ account, balanceCents }: { account: Accoun
               inputMode="decimal"
               value={value}
               onChange={(e) => setValue(sanitizeAmountInput(e.target.value, true))}
-              className="!text-lg font-bold"
+              className="!text-heading font-bold"
             />
           </div>
           {diff !== null && (
@@ -291,10 +297,10 @@ export function AccountSettings({ account, balanceCents }: { account: Account; b
 
   return (
     <div className="flex flex-col gap-3">
-      <label className="flex items-start justify-between gap-3 text-sm">
+      <label className="flex items-start justify-between gap-3 text-body">
         <span>
           <span className="block font-semibold">Inclure dans le budget</span>
-          <span className="text-xs text-n-600">Ses dépenses comptent dans les budgets</span>
+          <span className="text-foot text-label-secondary">Ses dépenses comptent dans les budgets</span>
         </span>
         <input
           type="checkbox"
@@ -306,7 +312,7 @@ export function AccountSettings({ account, balanceCents }: { account: Account; b
           }}
         />
       </label>
-      <div className="grid grid-cols-2 gap-2 border-t border-divider pt-3">
+      <div className="grid grid-cols-2 gap-2 border-t border-separator pt-3">
         <Button onClick={() => setEditOpen(true)}>
           <Pencil size={14} /> Modifier
         </Button>
@@ -361,7 +367,7 @@ export function AccountSettings({ account, balanceCents }: { account: Account; b
           </>
         }
       >
-        <p className="text-sm">
+        <p className="text-body">
           Ce compte a un solde de <strong>{formatCents(balanceCents)}</strong> - archiver quand même ? Son historique reste
           consultable et intact.
         </p>

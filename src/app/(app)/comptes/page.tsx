@@ -39,24 +39,24 @@ export default async function AccountsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="pr-12 lg:pr-0">
-        <PageHeader kicker="Patrimoine" title="Comptes" actions={<NewAccountButton />} />
-      </div>
+      <PageHeader kicker="Patrimoine" title="Comptes" actions={<NewAccountButton />} mobileActions={<NewAccountButton compact />} />
 
       <Card>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-[260px_minmax(0,1fr)] md:items-end">
           <div>
-            <p className="text-sm font-semibold text-n-700">Patrimoine total</p>
-            <p className="text-4xl font-extrabold tabular-nums">{formatCents(total)}</p>
-            <p className="mt-1 text-sm font-bold text-accent-700">{formatCents(totalDelta, "always").replace(/,\d\d/, "")} en 12 mois</p>
+            <p className="text-sub font-semibold text-label-secondary">Patrimoine total</p>
+            <p className="text-stat-hero font-bold tabular-nums">{formatCents(total)}</p>
+            <p className={`mt-1 text-foot font-semibold ${totalDelta >= 0 ? "text-finances-text" : "text-label-secondary"}`}>
+              {formatCents(totalDelta, "always").replace(/,\d\d/, "")} en 12 mois
+            </p>
             {positiveTotal > 0 && (
               <>
-                <div className="mt-4 flex h-2 overflow-hidden rounded-full">
+                <div className="mt-4 flex h-2 gap-0.5 overflow-hidden rounded-full">
                   {positive.map((r) => (
                     <div key={r.account.id} style={{ width: `${(r.balance / positiveTotal) * 100}%`, backgroundColor: r.account.color }} />
                   ))}
                 </div>
-                <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-n-700">
+                <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-foot text-label-secondary">
                   {positive.map((r) => (
                     <span key={r.account.id} className="flex items-center gap-1">
                       <span className="size-1.5 rounded-full" style={{ backgroundColor: r.account.color }} />
@@ -73,19 +73,19 @@ export default async function AccountsPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {rows.map(({ account, balance, delta, series }) => (
-          <Link key={account.id} href={`/comptes/${account.id}`} className="rounded-card bg-surface p-4 shadow-card transition-shadow hover:shadow-pop">
+          <Link key={account.id} href={`/comptes/${account.id}`} className="rounded-lg bg-bg-grouped-secondary p-4 shadow-card transition-[transform,background-color] hover:bg-fill-tertiary motion-safe:active:scale-[0.98] md:p-5">
             <div className="flex items-center gap-2.5">
               <IconBadge icon={account.icon} color={account.color} />
               <div className="min-w-0">
-                <p className="truncate font-bold">{account.name}</p>
-                <p className="text-xs text-n-600">{ACCOUNT_TYPE_LABELS[account.type]}</p>
+                <p className="truncate text-body font-semibold">{account.name}</p>
+                <p className="text-foot text-label-secondary">{ACCOUNT_TYPE_LABELS[account.type]}</p>
               </div>
             </div>
-            <p className="mt-3 text-2xl font-extrabold tabular-nums">{formatCents(balance)}</p>
+            <p className="mt-3 text-stat">{formatCents(balance)}</p>
             <Sparkline values={series} color={account.color} width={220} height={40} className="mt-2 w-full" />
-            <div className="mt-2 flex items-center justify-between text-[11px] text-n-600">
+            <div className="mt-2 flex items-center justify-between text-foot text-label-secondary">
               <span>{formatCents(delta, "always").replace(/,\d\d/, "")} sur 12 mois</span>
-              <span className={`rounded-full px-2 py-0.5 font-bold ${account.inBudget ? "bg-accent-100 text-accent-700" : "bg-n-200 text-n-700"}`}>
+              <span className={`rounded-full px-2 py-0.5 font-semibold ${account.inBudget ? "bg-finances-bg text-finances-text" : "bg-fill-secondary text-label-secondary"}`}>
                 {account.inBudget ? "Dans le budget" : "Hors budget"}
               </span>
             </div>
@@ -101,14 +101,15 @@ export default async function AccountsPage() {
 
       {archived.length > 0 && (
         <Card>
-          <h2 className="mb-2 text-[11px] font-bold uppercase tracking-wider text-n-600">Archivés - historique conservé</h2>
-          <ul className="divide-y divide-divider">
+          <h2 className="mb-2 text-heading">Comptes archivés</h2>
+          <p className="mb-2 text-sub text-label-secondary">Leur historique est conservé.</p>
+          <ul className="divide-y-[0.5px] divide-separator">
             {archived.map((a) => (
               <li key={a.id} className="flex items-center gap-3 py-2 opacity-70">
-                <IconBadge icon={a.icon} color="#98a1b0" size="sm" />
+                <IconBadge icon={a.icon} color="var(--gray)" />
                 <Link href={`/comptes/${a.id}`} className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold">{a.name}</p>
-                  <p className="text-[11px] text-n-600">
+                  <p className="truncate text-body">{a.name}</p>
+                  <p className="text-sub text-label-secondary">
                     Archivé en {new Date(a.archivedAt!).toLocaleDateString("fr-FR", { month: "long", year: "numeric" })} ·{" "}
                     {balances.get(a.id)?.count ?? 0} transactions conservées
                   </p>

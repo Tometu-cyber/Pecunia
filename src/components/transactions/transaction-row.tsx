@@ -30,7 +30,7 @@ export function TransactionRow({
 }) {
   const isTransfer = tx.type === "transfer";
   const icon = isTransfer ? "transfer" : tx.type === "adjust" ? "adjust" : (category?.icon ?? "circle");
-  const color = isTransfer ? "#98a1b0" : tx.type === "adjust" ? "#c2c8d2" : (category?.color ?? "#98a1b0");
+  const color = isTransfer ? "var(--gray)" : tx.type === "adjust" ? "var(--gray-2)" : (category?.color ?? "var(--gray)");
   const accountLabel =
     isTransfer && account && counterpart
       ? consolidated || tx.amountCents < 0
@@ -47,19 +47,23 @@ export function TransactionRow({
     <button
       type="button"
       onClick={onClick}
-      className={clsx("flex w-full items-center gap-3 bg-surface px-4 py-3 text-left", onClick && "hover:bg-n-100 active:bg-n-100")}
+      // ligne de liste du design system (ListRow) : repère rond, titre, sous-titre, montant
+      className={clsx(
+        "flex min-h-11 w-full items-center gap-3 bg-bg-grouped-secondary px-4 py-2.5 text-left md:py-2",
+        onClick && "hover:bg-fill-tertiary active:bg-fill-secondary",
+      )}
     >
       <IconBadge icon={icon} color={color} />
       <div className="min-w-0 flex-1">
-        <p className="flex items-center gap-2 font-bold">
+        <p className="flex items-center gap-2 text-body">
           <span className="truncate">{tx.place || (isTransfer ? "Virement" : "Sans libellé")}</span>
           {tag && tx.type !== "adjust" && (
-            <span className="rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-bold text-accent-700">{tag}</span>
+            <span className="shrink-0 rounded-full bg-finances-bg px-2 py-0.5 text-foot font-semibold text-finances-text">{tag}</span>
           )}
         </p>
-        <p className="truncate text-xs text-n-600">{sub}</p>
+        <p className="truncate text-sub text-label-secondary">{sub}</p>
       </div>
-      <Amount cents={consolidated && isTransfer ? Math.abs(tx.amountCents) : tx.amountCents} type={tx.type} neutral={consolidated && isTransfer} />
+      <Amount cents={consolidated && isTransfer ? Math.abs(tx.amountCents) : tx.amountCents} type={tx.type} neutral={consolidated && isTransfer} className="text-body" />
     </button>
   );
 }

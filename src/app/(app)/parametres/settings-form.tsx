@@ -18,7 +18,7 @@ function Row({ label, hint, children }: { label: string; hint?: string; children
     <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 py-3">
       <div>
         <p className="font-semibold">{label}</p>
-        {hint && <p className="text-xs text-n-600">{hint}</p>}
+        {hint && <p className="text-foot text-label-secondary">{hint}</p>}
       </div>
       <div>{children}</div>
     </div>
@@ -57,15 +57,15 @@ export function SettingsForm({ profile }: { profile: Profile }) {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <Card>
-        <h2 className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-n-700">
+        <h2 className="flex items-center gap-2 text-foot font-bold text-label-secondary">
           Préférences {pending && <Spinner size={12} label="Enregistrement" />}
         </h2>
-        <div className="divide-y divide-divider">
+        <div className="divide-y divide-separator">
           <Row label="Devise">
-            <span className="text-sm text-n-700">Euro (€)</span>
+            <span className="text-body text-label-secondary">Euro (€)</span>
           </Row>
           <Row label="Format de date">
-            <span className="text-sm text-n-700">28/09/2026</span>
+            <span className="text-body text-label-secondary">28/09/2026</span>
           </Row>
           <Row label="Début du mois" hint="Découpage des mois budgétaires dans toute l'app">
             <Select
@@ -96,10 +96,10 @@ export function SettingsForm({ profile }: { profile: Profile }) {
       </Card>
 
       <Card>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-n-700">Données</h2>
-        <div className="divide-y divide-divider">
+        <h2 className="text-foot font-bold text-label-secondary">Données</h2>
+        <div className="divide-y divide-separator">
           <Row label="Importer un CSV" hint="Historique d'un compte (tableur, export bancaire)">
-            <a href="/import" className="inline-flex min-h-10 items-center gap-2 rounded-[10px] border border-n-300 px-3 text-sm font-semibold hover:bg-n-100">
+            <a href="/import" className="inline-flex min-h-10 items-center gap-2 rounded-[10px] border border-separator-opaque px-3 text-body font-semibold hover:bg-fill-tertiary">
               Importer
             </a>
           </Row>
@@ -114,14 +114,14 @@ export function SettingsForm({ profile }: { profile: Profile }) {
       </Card>
 
       <Card>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-n-700">Compte</h2>
-        <div className="divide-y divide-divider">
+        <h2 className="text-foot font-bold text-label-secondary">Compte</h2>
+        <div className="divide-y divide-separator">
           <Row label="Utilisateur">
-            <span className="text-sm text-n-700">{profile.email}</span>
+            <span className="text-body text-label-secondary">{profile.email}</span>
           </Row>
           <div className="py-3">
             <form action={signOut}>
-              <SubmitButton className="inline-flex min-h-10 items-center gap-2 font-semibold text-danger-700" pendingChildren="Déconnexion…">
+              <SubmitButton className="inline-flex min-h-10 items-center gap-2 font-semibold text-danger-text" pendingChildren="Déconnexion…">
                 <LogOut size={16} /> Se déconnecter
               </SubmitButton>
             </form>
@@ -133,15 +133,15 @@ export function SettingsForm({ profile }: { profile: Profile }) {
       </Card>
 
       <Card>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-n-700">À propos</h2>
-        <div className="divide-y divide-divider">
+        <h2 className="text-foot font-bold text-label-secondary">À propos</h2>
+        <div className="divide-y divide-separator">
           <Row label="Version">
-            <span className="text-sm text-n-700 tabular-nums">
+            <span className="text-body text-label-secondary tabular-nums">
               {APP_NAME} {versionLabel()}
             </span>
           </Row>
           <Row label="Copyright">
-            <span className="text-sm text-n-700">{copyrightLine()} · Tous droits réservés</span>
+            <span className="text-body text-label-secondary">{copyrightLine()} · Tous droits réservés</span>
           </Row>
         </div>
       </Card>
@@ -204,7 +204,7 @@ function DeleteAccountButton({ email }: { email: string }) {
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="text-sm font-semibold text-danger-700 hover:underline">
+      <button type="button" onClick={() => setOpen(true)} className="text-body font-semibold text-danger-text hover:underline">
         Supprimer…
       </button>
       <Modal
@@ -221,7 +221,7 @@ function DeleteAccountButton({ email }: { email: string }) {
         }
       >
         <div className="flex flex-col gap-4">
-          <p className="text-sm">
+          <p className="text-body">
             Comptes, transactions, catégories, budgets, récurrences et objectifs seront <strong>définitivement effacés</strong>. Pense à
             faire une sauvegarde JSON avant.
           </p>

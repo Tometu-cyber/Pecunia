@@ -209,12 +209,12 @@ export function RecurrenceFormModal({
           </div>
         </div>
         {draft.type === "out" && (
-          <label className="flex items-center gap-2 text-sm font-semibold">
+          <label className="flex items-center gap-2 text-body font-semibold">
             <input type="checkbox" checked={draft.isSubscription} onChange={(e) => set({ isSubscription: e.target.checked })} />
             Abonnement
           </label>
         )}
-        <p className="text-xs text-n-600">
+        <p className="text-foot text-label-secondary">
           {draft.frequency === "weekly"
             ? "Une échéance tous les 7 jours à partir de la date de début."
             : "Si le jour n'existe pas dans le mois (ex. 31), l'échéance tombe le dernier jour du mois."}
