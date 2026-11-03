@@ -44,16 +44,16 @@ export function TransactionsView({ transactions, initialAccount }: { transaction
 
   return (
     <>
-      <div className="flex flex-col gap-3 md:rounded-card md:bg-surface md:p-4 md:shadow-card">
+      <div className="flex flex-col gap-3 md:rounded-lg md:bg-bg-grouped-secondary md:p-4 md:shadow-card">
         <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_200px]">
           <label className="relative block">
-            <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-n-500" />
+            <Search size={16} strokeWidth={2} className="absolute top-1/2 left-3 -translate-y-1/2 text-label-secondary md:left-2.5 md:size-3.5" aria-hidden />
             <input
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher un lieu, une note"
-              className="block min-h-11 w-full rounded-[10px] border border-n-300 bg-surface pr-3 pl-9 text-[15px] placeholder:text-n-500 focus:border-accent focus:outline-none md:min-h-9 md:text-sm"
+              className="block min-h-11 w-full rounded-full border border-transparent bg-fill-tertiary pr-3 pl-9 text-[17px] text-label placeholder:text-label-tertiary focus:border-finances focus:bg-bg-tertiary focus:shadow-[0_0_0_4px_var(--finances-bg)] focus:outline-none md:min-h-7 md:pl-8 md:text-[13px]"
             />
           </label>
           <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} aria-label="Catégorie" className="hidden md:block">
@@ -88,12 +88,12 @@ export function TransactionsView({ transactions, initialAccount }: { transaction
         </div>
       </div>
 
-      <div className="flex items-center justify-between rounded-card bg-accent-100 px-4 py-3.5">
-        <p className="text-sm text-n-800">
+      <div className="flex items-center justify-between gap-3 rounded-lg bg-finances-bg px-4 py-3.5">
+        <p className="text-body text-label">
           <strong>{filtered.length}</strong> transaction{filtered.length > 1 ? "s" : ""}
           {!accountId && <span className="hidden md:inline"> · virements internes neutres dans le total</span>}
         </p>
-        <p className={`text-xl font-extrabold tabular-nums md:text-2xl ${total >= 0 ? "text-accent-700" : ""}`}>
+        <p className={`font-rounded text-[22px] leading-7 font-bold tabular-nums ${total >= 0 ? "text-finances-text" : "text-label"}`}>
           {formatCents(total, total > 0 ? "always" : "auto")}
         </p>
       </div>
@@ -101,16 +101,16 @@ export function TransactionsView({ transactions, initialAccount }: { transaction
       {groups.length === 0 ? (
         <EmptyState>Aucune transaction ne correspond à ces filtres.</EmptyState>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-5">
           {groups.map((g) => {
             const dayTotal = signedTotal(g.items, accountId);
             return (
-              <section key={g.date} className="overflow-hidden rounded-card bg-surface shadow-card">
-                <header className="flex items-center justify-between border-b border-divider px-4 py-2.5 text-sm">
-                  <h2 className="font-bold">{dayLabel(g.date)}</h2>
-                  <Amount cents={dayTotal} className="!text-xs !font-normal !text-n-600" />
+              <section key={g.date}>
+                <header className="mx-4 mb-1.5 flex items-baseline justify-between gap-3 text-foot font-semibold text-label-secondary">
+                  <h2>{dayLabel(g.date)}</h2>
+                  <Amount cents={dayTotal} className="!font-semibold !text-label-secondary" />
                 </header>
-                <ul className="divide-y divide-divider">
+                <ul className="pt-list-inset overflow-hidden rounded-lg bg-bg-grouped-secondary shadow-card">
                   {g.items.map((t) => (
                     <li key={t.id}>
                       <SwipeActions

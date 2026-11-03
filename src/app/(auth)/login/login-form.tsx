@@ -115,7 +115,7 @@ export function LoginForm({ allowSignup }: { allowSignup: boolean }) {
         />
         <FieldError>{fieldErrors.password}</FieldError>
       </div>
-      <Link href="/mot-de-passe-oublie" className="self-start text-sm font-bold text-accent-700 hover:text-accent">
+      <Link href="/mot-de-passe-oublie" className="inline-flex min-h-11 items-center self-start text-body font-semibold text-finances-text hover:underline md:min-h-7">
         Mot de passe oublié ?
       </Link>
       <Button type="submit" variant="primary" loading={pending === "password"} disabled={!!pending} className="w-full">
@@ -123,10 +123,10 @@ export function LoginForm({ allowSignup }: { allowSignup: boolean }) {
       </Button>
       <FieldError>{error}</FieldError>
       {info && <Banner tone="success">{info}</Banner>}
-      <div className="flex items-center gap-3 text-xs text-n-600">
-        <span className="h-px flex-1 bg-divider" />
+      <div className="flex items-center gap-3 text-foot text-label-secondary">
+        <span className="h-[0.5px] flex-1 bg-separator" />
         ou
-        <span className="h-px flex-1 bg-divider" />
+        <span className="h-[0.5px] flex-1 bg-separator" />
       </div>
       <div className="grid grid-cols-2 gap-2">
         <Button onClick={sendMagicLink} loading={pending === "magic"} disabled={!!pending}>
@@ -137,9 +137,9 @@ export function LoginForm({ allowSignup }: { allowSignup: boolean }) {
         </Button>
       </div>
       {allowSignup && (
-        <p className="text-center text-sm text-n-600">
+        <p className="text-center text-body text-label-secondary">
           Pas encore de compte ?{" "}
-          <Link href="/inscription" className="font-bold text-accent-700">
+          <Link href="/inscription" className="font-semibold text-finances-text hover:underline">
             Créer un compte
           </Link>
         </p>

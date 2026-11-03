@@ -175,15 +175,17 @@ export function SwipeActions({
         aria-hidden={!open}
         tabIndex={open ? 0 : -1}
         disabled={pending}
-        className="absolute inset-y-0 right-0 flex flex-col items-center justify-center gap-1 bg-danger-solid text-xs font-semibold text-white"
+        // rouge de suppression : danger-text du thème clair (#d70015) dans les deux thèmes, pour
+        // garder le texte blanc à 5,5:1 (le rouge système plein n'atteint que 3,6:1)
+        className="absolute inset-y-0 right-0 flex flex-col items-center justify-center gap-1 bg-[#d70015] text-[13px] font-semibold text-white md:text-[11px]"
         style={{ width: ACTION_WIDTH, visibility: "hidden" }}
       >
-        {pending ? <Spinner size={18} className="text-white" label="Suppression" /> : <Trash2 size={18} />}
+        {pending ? <Spinner size={18} className="text-white" label="Suppression" /> : <Trash2 size={20} strokeWidth={1.75} />}
         Supprimer
       </button>
       <div
         ref={rowRef}
-        className="relative touch-pan-y bg-surface will-change-transform"
+        className="relative touch-pan-y bg-bg-grouped-secondary will-change-transform"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}

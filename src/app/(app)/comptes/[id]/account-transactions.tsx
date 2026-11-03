@@ -16,14 +16,14 @@ export function AccountTransactions({ groups }: { groups: { date: string; total:
   const all = groups.flatMap((g) => g.items);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-5">
       {groups.map((g) => (
-        <section key={g.date} className="overflow-hidden rounded-card bg-surface shadow-card">
-          <header className="flex items-center justify-between border-b border-divider px-4 py-2.5 text-sm">
-            <h3 className="font-bold">{dayLabel(g.date)}</h3>
-            <Amount cents={g.total} className="!text-xs !font-normal !text-n-600" />
+        <section key={g.date}>
+          <header className="mx-4 mb-1.5 flex items-baseline justify-between gap-3 text-foot font-semibold text-label-secondary">
+            <h3>{dayLabel(g.date)}</h3>
+            <Amount cents={g.total} className="!font-semibold !text-label-secondary" />
           </header>
-          <ul className="divide-y divide-divider">
+          <ul className="pt-list-inset overflow-hidden rounded-lg bg-bg-grouped-secondary shadow-card">
             {g.items.map((t) => (
               <li key={t.id}>
                 <SwipeActions

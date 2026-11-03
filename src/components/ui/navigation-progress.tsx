@@ -61,7 +61,7 @@ export function NavigationProgress() {
       style={{ opacity: phase === "idle" ? 0 : 1, transition: "opacity 300ms" }}
     >
       <div
-        className="h-full bg-accent shadow-[0_0_8px_var(--accent)]"
+        className="h-full bg-finances shadow-[0_0_8px_var(--finances)]"
         style={{
           width: phase === "idle" ? "0%" : phase === "loading" ? "85%" : "100%",
           transition: phase === "loading" ? "width 6s cubic-bezier(0.1, 0.7, 0.2, 1)" : phase === "done" ? "width 200ms ease-out" : "none",

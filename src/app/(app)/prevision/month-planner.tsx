@@ -145,7 +145,7 @@ export function MonthPlanner({ month, period, today, lines, realized, summary, d
             action={
               selection.length > 0 ? (
                 <div className="flex flex-wrap justify-end gap-2">
-                  <Button onClick={() => decideMany(selection, "rejected", "sel:rejected")} loading={isBusy("sel:rejected")} className="!text-danger-700">
+                  <Button variant="danger" onClick={() => decideMany(selection, "rejected", "sel:rejected")} loading={isBusy("sel:rejected")}>
                     <X size={15} /> Refuser ({selection.length})
                   </Button>
                   <Button variant="primary" onClick={() => decideMany(selection, "accepted", "sel:accepted")} loading={isBusy("sel:accepted")}>
@@ -160,10 +160,10 @@ export function MonthPlanner({ month, period, today, lines, realized, summary, d
             }
           />
           {toValidate.length > 1 && (
-            <label className="flex min-h-9 cursor-pointer items-center gap-3 border-b border-divider pb-2 text-xs font-semibold text-n-700">
+            <label className="flex min-h-9 cursor-pointer items-center gap-3 border-b-[0.5px] border-separator pb-2 text-foot font-semibold text-label-secondary">
               <input
                 type="checkbox"
-                className="size-4 accent-[var(--accent)]"
+                className="size-4 accent-[var(--finances)]"
                 checked={allChecked}
                 ref={(el) => {
                   if (el) el.indeterminate = selection.length > 0 && !allChecked;
@@ -174,11 +174,11 @@ export function MonthPlanner({ month, period, today, lines, realized, summary, d
             </label>
           )}
           {toValidate.length === 0 ? (
-            <p className="text-sm text-n-600">
+            <p className="text-body text-label-secondary">
               Rien à valider ce mois-ci. Tes budgets sont proposés ici ; les échéances de tes récurrences sont retenues d&apos;office.
             </p>
           ) : (
-            <ul className="divide-y divide-divider">
+            <ul className="divide-y-[0.5px] divide-separator">
               {toValidate.map((l) => (
                 <Line
                   key={l.key}
@@ -188,7 +188,7 @@ export function MonthPlanner({ month, period, today, lines, realized, summary, d
                   leading={
                     <input
                       type="checkbox"
-                      className="size-4 shrink-0 cursor-pointer accent-[var(--accent)]"
+                      className="size-4 shrink-0 cursor-pointer accent-[var(--finances)]"
                       checked={checked.has(l.key)}
                       onChange={() => toggle(l.key)}
                       aria-label={`Sélectionner ${l.label}`}
@@ -220,11 +220,11 @@ export function MonthPlanner({ month, period, today, lines, realized, summary, d
             }
           />
           {retained.length === 0 ? (
-            <p className="text-sm text-n-600">
+            <p className="text-body text-label-secondary">
               Accepte des budgets ou ajoute une entrée / sortie prévue, pour ce mois seulement ou pour plusieurs mois.
             </p>
           ) : (
-            <ul className="divide-y divide-divider">
+            <ul className="divide-y-[0.5px] divide-separator">
               {retained.map((l) => (
                 <Line key={l.key} label={l.label} meta={meta(l)} amount={amountOf(l)}>
                   <IconButton label={`Modifier ${l.label}`} onClick={() => openEdit(l)}>
@@ -254,7 +254,7 @@ export function MonthPlanner({ month, period, today, lines, realized, summary, d
         {rejected.length > 0 && (
           <Card>
             <CardHeader title="Refusé" />
-            <ul className="divide-y divide-divider opacity-70">
+            <ul className="divide-y-[0.5px] divide-separator opacity-70">
               {rejected.map((l) => (
                 <Line key={l.key} label={<span className="line-through">{l.label}</span>} meta={meta(l)} amount={amountOf(l)}>
                   <IconButton label={`Rétablir ${l.label}`} onClick={() => reset(l)} loading={isBusy(`${l.key}:reset`)}>
@@ -270,7 +270,7 @@ export function MonthPlanner({ month, period, today, lines, realized, summary, d
       <div className="order-first flex min-w-0 flex-col gap-4 lg:order-none">
         <Card>
           <CardHeader title="Bilan du mois" />
-          <dl className="flex flex-col gap-2 text-sm">
+          <dl className="flex flex-col gap-2 text-body">
             <SummaryRow label="Solde de début">{formatCents(summary.startCents)}</SummaryRow>
             <SummaryRow label="Entrées retenues">
               <Amount cents={summary.inCents} />
@@ -278,16 +278,16 @@ export function MonthPlanner({ month, period, today, lines, realized, summary, d
             <SummaryRow label="Sorties retenues">
               <Amount cents={-summary.outCents} />
             </SummaryRow>
-            <div className="mt-1 border-t border-divider pt-2">
+            <div className="mt-1 border-t-[0.5px] border-separator pt-2">
               <SummaryRow label={<strong>Solde de fin projeté</strong>}>
-                <span className={clsx("text-lg font-extrabold tabular-nums", summary.endCents < 0 && "text-danger-700")}>
+                <span className={clsx("font-rounded text-[22px] leading-7 font-bold tabular-nums", summary.endCents < 0 && "text-danger-text")}>
                   {formatCents(summary.endCents)}
                 </span>
               </SummaryRow>
             </div>
             {toValidate.length > 0 && summary.endIfAllCents !== summary.endCents && (
-              <p className="text-xs text-n-600">
-                Si tout était accepté : <span className={clsx("font-semibold tabular-nums", summary.endIfAllCents < 0 && "text-danger-700")}>{formatCents(summary.endIfAllCents)}</span>
+              <p className="text-foot text-label-secondary">
+                Si tout était accepté : <span className={clsx("font-semibold tabular-nums", summary.endIfAllCents < 0 && "text-danger-text")}>{formatCents(summary.endIfAllCents)}</span>
               </p>
             )}
           </dl>
@@ -296,18 +296,18 @@ export function MonthPlanner({ month, period, today, lines, realized, summary, d
         {realized.length > 0 && (
           <Card>
             <CardHeader title="Déjà réalisé" />
-            <ul className="flex flex-col gap-1.5 text-sm">
+            <ul className="flex flex-col gap-1.5 text-body">
               {realized.map((r) => (
-                <li key={r.key} className="flex items-center justify-between gap-2 text-n-700">
+                <li key={r.key} className="flex items-center justify-between gap-2 text-label-secondary">
                   <span className="min-w-0 truncate">
-                    <Check size={13} className="mr-1 inline text-accent-700" />
-                    {r.label} <span className="text-[11px] text-n-600">· {shortDate(r.date)}</span>
+                    <Check size={14} strokeWidth={2.2} className="mr-1 inline text-finances-text" aria-hidden />
+                    {r.label} <span className="text-foot text-label-secondary">· {shortDate(r.date)}</span>
                   </span>
-                  <Amount cents={r.cents} neutral={r.transfer && r.cents === 0} className="text-xs" />
+                  <Amount cents={r.cents} neutral={r.transfer && r.cents === 0} className="text-foot" />
                 </li>
               ))}
             </ul>
-            <p className="mt-2 text-[11px] text-n-600">Déjà dans le solde actuel.</p>
+            <p className="mt-2 text-foot text-label-secondary">Déjà dans le solde actuel.</p>
           </Card>
         )}
       </div>
@@ -343,13 +343,13 @@ function Line({
   children: ReactNode;
 }) {
   return (
-    <li className="flex items-center gap-3 py-2.5">
+    <li className="flex min-h-11 items-center gap-3 py-2.5">
       {leading}
       <div className="min-w-0 flex-1">
-        <p className="truncate font-semibold">{label}</p>
-        <p className="text-xs text-n-600 md:truncate">{meta}</p>
+        <p className="truncate text-body">{label}</p>
+        <p className="text-sub text-label-secondary md:truncate">{meta}</p>
       </div>
-      <span className="text-sm">{amount}</span>
+      <span className="text-body tabular-nums">{amount}</span>
       <div className="flex min-w-[116px] shrink-0 justify-end gap-1">{children}</div>
     </li>
   );
@@ -376,10 +376,10 @@ function IconButton({
       aria-label={label}
       title={label}
       className={clsx(
-        "!min-h-9 !px-2",
-        tone === "accept" && "!text-accent-700 hover:!bg-accent-100",
-        tone === "reject" && "!text-danger-700 hover:!bg-danger-100",
-        !tone && "!text-n-700 hover:!bg-n-100",
+        "!size-11 !min-h-0 !px-0 md:!size-7",
+        tone === "accept" && "!text-finances-text hover:!bg-finances-bg",
+        tone === "reject" && "!text-danger-text hover:!bg-danger/12",
+        !tone && "!text-label-secondary hover:!bg-fill-tertiary",
       )}
     >
       {!loading && children}
@@ -390,7 +390,7 @@ function IconButton({
 function SummaryRow({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <dt className="text-n-700">{label}</dt>
+      <dt className="text-label-secondary">{label}</dt>
       <dd className="tabular-nums">{children}</dd>
     </div>
   );
@@ -452,11 +452,11 @@ function ProposalModal({
       }
     >
       <div className="flex flex-col gap-4">
-        <p className="text-sm text-n-700">
+        <p className="text-body text-label-secondary">
           Proposé : {formatCents(line.proposedCents)}
           {line.proposedDate && ` le ${shortDate(line.proposedDate)}`}. La modification ne vaut que pour {monthLabel(month).toLowerCase()}.
         </p>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 [&>*]:min-w-0">
           <div>
             <Label htmlFor="pr-amount">Montant</Label>
             <Input id="pr-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(sanitizeAmountInput(e.target.value))} />
@@ -557,13 +557,13 @@ function PlannedModal({
         <>
           {line?.itemId && (
             <div className="mr-auto flex gap-2">
-              <Button variant="ghost" className="!text-danger-700" onClick={() => act("del", () => deleteForecastItem(line.itemId!), "Ligne supprimée")} loading={pending && busy === "del"}>
+              <Button variant="ghost" className="!text-danger-text" onClick={() => act("del", () => deleteForecastItem(line.itemId!), "Ligne supprimée")} loading={pending && busy === "del"}>
                 Supprimer
               </Button>
               {line.seriesId && (
                 <Button
                   variant="ghost"
-                  className="!text-danger-700"
+                  className="!text-danger-text"
                   onClick={() => act("series", () => deleteForecastItem(line.itemId!, true), "Série supprimée à partir de ce mois")}
                   loading={pending && busy === "series"}
                 >
@@ -598,7 +598,7 @@ function PlannedModal({
             placeholder={transfer ? defaultLabel() : "Assurance auto, prime, vacances…"}
           />
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 [&>*]:min-w-0">
           <div>
             <Label htmlFor="pl-amount">Montant</Label>
             <Input id="pl-amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(sanitizeAmountInput(e.target.value))} placeholder="0,00" />
@@ -655,11 +655,11 @@ function PlannedModal({
           )}
         </div>
         {!line && count > 1 && (
-          <p className="text-xs text-n-600">
+          <p className="text-foot text-label-secondary">
             Une ligne par mois, au même jour, pendant {count} mois. Chaque mois reste modifiable ou supprimable séparément.
           </p>
         )}
-        {line?.seriesId && <p className="text-xs text-n-600">Cette ligne fait partie d&apos;une série : la modification ne concerne que ce mois.</p>}
+        {line?.seriesId && <p className="text-foot text-label-secondary">Cette ligne fait partie d&apos;une série : la modification ne concerne que ce mois.</p>}
         <FieldError>{error}</FieldError>
       </div>
     </Modal>

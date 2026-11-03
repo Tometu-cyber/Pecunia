@@ -11,11 +11,9 @@ export default async function CategoriesPage() {
     budgets.map((b) => [b.categoryId, effectiveBudgetCents(b, profile.referenceIncomeCents)]),
   );
   return (
-    <>
-      <div className="pr-12 lg:pr-0">
-        <PageHeader kicker="Gestion" title="Catégories" />
-      </div>
+    <div className="flex flex-col gap-4">
+      <PageHeader kicker="Gestion" title="Catégories" />
       <CategoriesManager categories={categories} budgetByCategory={budgetByCategory} />
-    </>
+    </div>
   );
 }

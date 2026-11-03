@@ -5,11 +5,9 @@ export const metadata = { title: "Saisie" };
 
 export default function EntryPage() {
   return (
-    <>
-      <div className="pr-12 lg:pr-0">
-        <PageHeader kicker="Session de saisie" title="Saisir" />
-      </div>
+    <div className="flex flex-col gap-4">
+      <PageHeader kicker="Session de saisie" title="Saisir" />
       <EntrySession />
-    </>
+    </div>
   );
 }

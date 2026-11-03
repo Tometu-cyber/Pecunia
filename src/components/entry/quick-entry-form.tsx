@@ -207,11 +207,11 @@ export function QuickEntryForm({
               aria-checked={value === a.id}
               onClick={() => onChange(a.id)}
               className={clsx(
-                "inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-semibold",
-                value === a.id ? "border-ink bg-ink text-on-ink" : "border-n-300 bg-surface",
+                "inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full px-4 text-[17px] tracking-[-0.43px] transition-colors",
+                value === a.id ? "bg-finances-bg font-semibold text-finances-text" : "bg-bg-grouped-secondary text-label shadow-card",
               )}
             >
-              <span className="size-2 rounded-full" style={{ backgroundColor: a.color }} />
+              <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: a.color }} />
               {shortAccountName(a)}
             </button>
           ))}
@@ -236,15 +236,15 @@ export function QuickEntryForm({
           aria-checked={value === a.id}
           onClick={() => onChange(a.id)}
           className={clsx(
-            "rounded-xl border px-3 py-2.5 text-left",
-            value === a.id ? "border-ink bg-ink text-on-ink" : "border-n-300 bg-surface hover:bg-n-100",
+            "rounded-md px-3 py-2.5 text-left transition-colors",
+            value === a.id ? "bg-finances-bg text-finances-text" : "bg-bg-grouped-secondary shadow-card hover:bg-fill-tertiary",
           )}
         >
-          <span className="flex items-center gap-1.5 text-sm font-bold">
-            <span className="size-2 rounded-full" style={{ backgroundColor: a.color }} />
+          <span className="flex items-center gap-1.5 text-body font-semibold">
+            <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: a.color }} />
             {shortAccountName(a)}
           </span>
-          <span className={clsx("text-xs tabular-nums", value === a.id ? "opacity-75" : "text-n-600")}>
+          <span className={clsx("text-sub tabular-nums", value === a.id ? "text-finances-text" : "text-label-secondary")}>
             {formatCents(balances[a.id] ?? 0)}
           </span>
         </button>
@@ -257,8 +257,8 @@ export function QuickEntryForm({
       {isSheet && (
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-xl font-extrabold">Nouvelle saisie</h2>
-            <p className="text-sm text-n-600">Session du {longDayMonth(todayIso())}</p>
+            <h2 className="text-heading">Nouvelle saisie</h2>
+            <p className="text-sub text-label-secondary">Session du {longDayMonth(todayIso())}</p>
           </div>
           <Button onClick={onDone}>Terminer</Button>
         </div>
@@ -288,7 +288,7 @@ export function QuickEntryForm({
             tone="info"
             action={
               <span className="flex shrink-0 gap-3 font-bold">
-                <button type="button" onClick={() => setLinkedForecastId(forecastMatch.id)} className="text-accent-700">
+                <button type="button" onClick={() => setLinkedForecastId(forecastMatch.id)} className="text-finances-text">
                   Lier
                 </button>
                 <button type="button" onClick={() => setDismissedForecastId(forecastMatch.id)}>
@@ -308,8 +308,8 @@ export function QuickEntryForm({
           {!isSheet && <Label htmlFor="entry-amount">Montant</Label>}
           <div
             className={clsx(
-              "flex items-center rounded-card border-2 bg-surface px-4 focus-within:border-accent",
-              isSheet ? "border-transparent py-3 shadow-card" : "border-n-300",
+              "flex items-center rounded-lg border border-transparent px-4 transition-[border-color,box-shadow] focus-within:border-finances focus-within:shadow-[0_0_0_4px_var(--finances-bg)]",
+              isSheet ? "bg-bg-grouped-secondary py-3 shadow-card" : "bg-fill-tertiary md:rounded-sm md:px-3",
             )}
           >
             <input
@@ -325,11 +325,11 @@ export function QuickEntryForm({
               }}
               aria-label="Montant"
               className={clsx(
-                "w-full bg-transparent font-extrabold tabular-nums placeholder:text-n-400 focus:outline-none",
-                isSheet ? "text-[42px] leading-tight" : "min-h-11 text-2xl",
+                "w-full bg-transparent font-rounded font-bold tabular-nums text-label placeholder:text-label-tertiary focus:outline-none",
+                isSheet ? "text-[44px] leading-[50px]" : "min-h-11 text-stat md:min-h-9",
               )}
             />
-            <span className={clsx("font-extrabold text-n-600", isSheet ? "text-3xl" : "text-xl")}>€</span>
+            <span className={clsx("font-rounded font-bold text-label-secondary", isSheet ? "text-[34px]" : "text-heading")}>€</span>
           </div>
         </div>
       </div>
@@ -345,13 +345,13 @@ export function QuickEntryForm({
                   key={r.id}
                   type="button"
                   onClick={() => applyTemplate(r)}
-                  className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-n-300 bg-surface px-3.5 text-sm font-semibold hover:bg-n-100 md:min-h-8 md:text-xs"
+                  className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full bg-fill-tertiary px-4 text-[15px] tracking-[-0.23px] hover:bg-fill-secondary md:min-h-7 md:px-3 md:text-[13px]"
                 >
                   <span
                     className="size-2 rounded-full"
                     style={{ backgroundColor: r.type === "transfer" ? (accountById.get(r.toAccountId ?? "")?.color ?? "#98a1b0") : (cat?.color ?? "#98a1b0") }}
                   />
-                  {r.label} <span className="font-normal text-n-600">· {centsToInput(r.amountCents)}</span>
+                  {r.label} <span className="font-normal text-label-secondary">· {centsToInput(r.amountCents)}</span>
                 </button>
               );
             })}
@@ -369,7 +369,7 @@ export function QuickEntryForm({
             <button
               type="button"
               onClick={swapAccounts}
-              className="flex size-11 items-center justify-center rounded-xl border border-n-300 bg-surface hover:bg-n-100"
+              className="flex size-11 items-center justify-center rounded-full bg-fill-secondary text-label hover:brightness-95"
               aria-label="Inverser les comptes"
             >
               <ArrowUpDown size={18} />
@@ -379,7 +379,7 @@ export function QuickEntryForm({
             <Label>Vers</Label>
             {transferCards(toAccountId, setToAccountId, "Compte destination")}
           </div>
-          <p className="rounded-xl bg-n-100 px-4 py-3 text-sm text-n-700">
+          <p className="rounded-md bg-fill-tertiary px-4 py-3 text-sub text-label-secondary">
             Pas de catégorie - exclu des dépenses, des budgets et du taux d&apos;épargne.
           </p>
           <div>
@@ -408,7 +408,7 @@ export function QuickEntryForm({
               aria-expanded={showSuggestions && suggestions.length > 0}
             />
             {showSuggestions && suggestions.length > 0 && (
-              <ul className="absolute inset-x-0 top-full z-20 mt-1 overflow-hidden rounded-xl border border-n-300 bg-surface shadow-pop" role="listbox">
+              <ul className="pt-glass-thick absolute inset-x-0 top-full z-20 mt-1.5 overflow-hidden rounded-[22px] p-1.5 md:rounded-[12px] md:p-1" role="listbox">
                 {suggestions.map((s) => {
                   const cat = s.categoryId ? categoryById.get(s.categoryId) : undefined;
                   return (
@@ -419,10 +419,10 @@ export function QuickEntryForm({
                         aria-selected={false}
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => pickSuggestion(s)}
-                        className="flex min-h-11 w-full items-center justify-between gap-2 px-3 text-left text-sm hover:bg-n-100"
+                        className="flex min-h-11 w-full items-center justify-between gap-2 rounded-[14px] px-3 text-left text-body hover:bg-fill-secondary md:min-h-7 md:rounded-[6px] md:px-2"
                       >
-                        <span className="font-semibold">{s.place}</span>
-                        <span className="text-xs text-n-600">
+                        <span>{s.place}</span>
+                        <span className="text-foot text-label-secondary">
                           {[cat?.name, accountById.get(s.accountId)?.name].filter(Boolean).join(" · ")}
                         </span>
                       </button>
@@ -432,7 +432,7 @@ export function QuickEntryForm({
               </ul>
             )}
             {memoryApplied && (
-              <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-accent-700">
+              <p className="mt-1.5 flex items-center gap-1 text-foot font-medium text-finances-text">
                 <Check size={13} /> Catégorie et compte repris de ta dernière saisie
               </p>
             )}
@@ -457,11 +457,11 @@ export function QuickEntryForm({
                         setError(null);
                       }}
                       className={clsx(
-                        "flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl border px-1 text-[11px] font-semibold leading-tight",
-                        selected ? "border-ink bg-ink text-on-ink" : "border-n-300 bg-surface",
+                        "flex min-h-16 flex-col items-center justify-center gap-1 rounded-md px-1 text-foot leading-tight transition-colors",
+                        selected ? "bg-finances-bg font-semibold text-finances-text" : "bg-bg-grouped-secondary shadow-card",
                       )}
                     >
-                      <Icon size={18} style={selected ? undefined : { color: c.color }} />
+                      <Icon size={20} strokeWidth={1.75} style={selected ? undefined : { color: c.color }} aria-hidden />
                       <span className="max-w-full truncate">{c.name}</span>
                     </button>
                   );
@@ -516,11 +516,11 @@ export function QuickEntryForm({
       )}
 
       <div className={clsx("grid grid-cols-2 gap-3", !isSheet && "md:grid-cols-4")}>
-        <div>
+        <div className="min-w-0">
           <Label htmlFor="entry-date">Date</Label>
           <Input id="entry-date" type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)} required />
         </div>
-        <div className={clsx(!isSheet && "md:col-span-1")}>
+        <div className={clsx("min-w-0", !isSheet && "md:col-span-1")}>
           <Label htmlFor="entry-note">Note</Label>
           <Input id="entry-note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Facultatif" />
         </div>
@@ -528,26 +528,27 @@ export function QuickEntryForm({
 
       <FieldError>{error}</FieldError>
 
-      <div className={clsx("flex items-center gap-3", isSheet ? "sticky bottom-0 -mx-5 border-t border-divider bg-surface px-5 pt-3" : "border-t border-divider pt-4")}>
+      <div className={clsx("flex items-center gap-3", isSheet ? "sticky bottom-0 -mx-4 bg-bg-grouped px-4 pt-3 md:-mx-5 md:bg-bg-primary md:px-5" : "border-t-[0.5px] border-separator pt-4")}>
         <button
           type="submit"
           disabled={pending}
           className={clsx(
-            "flex items-center justify-between gap-3 rounded-[12px] bg-accent font-bold text-on-accent hover:bg-accent-600 disabled:opacity-60",
-            isSheet ? "min-h-14 w-full px-5 text-lg" : "min-h-10 px-4 text-sm",
+            // bouton plein du design system (filled, large) : capsule à la couleur de l'app
+            "flex items-center justify-between gap-3 rounded-full bg-finances font-semibold text-on-finances transition-[filter,transform] hover:brightness-105 motion-safe:active:scale-[0.98] disabled:opacity-60",
+            isSheet ? "min-h-[52px] w-full px-6 text-[17px] tracking-[-0.43px]" : "min-h-11 px-5 text-[17px] md:min-h-7 md:px-3 md:text-[13px]",
           )}
         >
-          <span className="flex items-center gap-2">
+          <span className="flex items-center gap-2 whitespace-nowrap">
             {pending && <Spinner size={isSheet ? 18 : 15} />}
             {pending ? "Enregistrement…" : "Valider et continuer"}
           </span>
           {isSheet ? (
-            <span className="text-sm font-medium">date conservée</span>
+            <span className="text-[13px] font-normal whitespace-nowrap opacity-80">date conservée</span>
           ) : (
             <CornerDownLeft size={15} className="opacity-75" />
           )}
         </button>
-        {!isSheet && <p className="text-xs text-n-600">Le formulaire se vide, la date reste.</p>}
+        {!isSheet && <p className="text-foot text-label-secondary">Le formulaire se vide, la date reste.</p>}
       </div>
     </form>
   );

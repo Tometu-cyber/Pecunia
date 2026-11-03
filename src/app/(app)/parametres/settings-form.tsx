@@ -6,7 +6,7 @@ import { useState, useTransition, type ReactNode } from "react";
 import { signOut, updateProfile } from "@/lib/data/actions";
 import { deleteMyAccount } from "@/lib/data/planning-actions";
 import type { Profile } from "@/lib/domain/types";
-import { Button, Card, FieldError, Input, Label, Segmented, Select } from "@/components/ui/primitives";
+import { Button, Card, FieldError, Input, Label, Segmented, Select, buttonClass } from "@/components/ui/primitives";
 import { Modal } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/overlay";
 import { Spinner } from "@/components/ui/spinner";
@@ -15,10 +15,11 @@ import { APP_NAME, copyrightLine, versionLabel } from "@/lib/version";
 
 function Row({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
-    <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 py-3">
-      <div>
-        <p className="font-semibold">{label}</p>
-        {hint && <p className="text-xs text-n-600">{hint}</p>}
+    // ligne de réglage façon Réglages d'iOS : libellé à gauche, contrôle à droite
+    <div className="flex min-h-11 flex-wrap items-center justify-between gap-x-3 gap-y-1.5 py-2.5 md:min-h-9 md:py-2">
+      <div className="min-w-0">
+        <p className="text-body">{label}</p>
+        {hint && <p className="text-sub text-label-secondary">{hint}</p>}
       </div>
       <div>{children}</div>
     </div>
@@ -57,15 +58,15 @@ export function SettingsForm({ profile }: { profile: Profile }) {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <Card>
-        <h2 className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-n-700">
+        <h2 className="mb-1 flex items-center gap-2 text-heading">
           Préférences {pending && <Spinner size={12} label="Enregistrement" />}
         </h2>
-        <div className="divide-y divide-divider">
+        <div className="divide-y-[0.5px] divide-separator">
           <Row label="Devise">
-            <span className="text-sm text-n-700">Euro (€)</span>
+            <span className="text-body text-label-secondary">Euro (€)</span>
           </Row>
           <Row label="Format de date">
-            <span className="text-sm text-n-700">28/09/2026</span>
+            <span className="text-body text-label-secondary">28/09/2026</span>
           </Row>
           <Row label="Début du mois" hint="Découpage des mois budgétaires dans toute l'app">
             <Select
@@ -96,10 +97,10 @@ export function SettingsForm({ profile }: { profile: Profile }) {
       </Card>
 
       <Card>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-n-700">Données</h2>
-        <div className="divide-y divide-divider">
+        <h2 className="mb-1 text-heading">Données</h2>
+        <div className="divide-y-[0.5px] divide-separator">
           <Row label="Importer un CSV" hint="Historique d'un compte (tableur, export bancaire)">
-            <a href="/import" className="inline-flex min-h-10 items-center gap-2 rounded-[10px] border border-n-300 px-3 text-sm font-semibold hover:bg-n-100">
+            <a href="/import" className={buttonClass("secondary")}>
               Importer
             </a>
           </Row>
@@ -114,15 +115,15 @@ export function SettingsForm({ profile }: { profile: Profile }) {
       </Card>
 
       <Card>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-n-700">Compte</h2>
-        <div className="divide-y divide-divider">
+        <h2 className="mb-1 text-heading">Compte</h2>
+        <div className="divide-y-[0.5px] divide-separator">
           <Row label="Utilisateur">
-            <span className="text-sm text-n-700">{profile.email}</span>
+            <span className="text-body text-label-secondary">{profile.email}</span>
           </Row>
-          <div className="py-3">
+          <div className="py-1">
             <form action={signOut}>
-              <SubmitButton className="inline-flex min-h-10 items-center gap-2 font-semibold text-danger-700" pendingChildren="Déconnexion…">
-                <LogOut size={16} /> Se déconnecter
+              <SubmitButton className="inline-flex min-h-11 items-center gap-2 text-body text-danger-text md:min-h-7" pendingChildren="Déconnexion…">
+                <LogOut size={18} strokeWidth={1.75} aria-hidden /> Se déconnecter
               </SubmitButton>
             </form>
           </div>
@@ -133,15 +134,15 @@ export function SettingsForm({ profile }: { profile: Profile }) {
       </Card>
 
       <Card>
-        <h2 className="text-[11px] font-bold uppercase tracking-wider text-n-700">À propos</h2>
-        <div className="divide-y divide-divider">
+        <h2 className="mb-1 text-heading">À propos</h2>
+        <div className="divide-y-[0.5px] divide-separator">
           <Row label="Version">
-            <span className="text-sm text-n-700 tabular-nums">
+            <span className="text-body text-label-secondary tabular-nums">
               {APP_NAME} {versionLabel()}
             </span>
           </Row>
           <Row label="Copyright">
-            <span className="text-sm text-n-700">{copyrightLine()} · Tous droits réservés</span>
+            <span className="text-body text-label-secondary">{copyrightLine()} · Tous droits réservés</span>
           </Row>
         </div>
       </Card>
@@ -204,7 +205,7 @@ function DeleteAccountButton({ email }: { email: string }) {
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="text-sm font-semibold text-danger-700 hover:underline">
+      <button type="button" onClick={() => setOpen(true)} className="inline-flex min-h-11 items-center text-body text-danger-text hover:underline md:min-h-7">
         Supprimer…
       </button>
       <Modal
@@ -221,7 +222,7 @@ function DeleteAccountButton({ email }: { email: string }) {
         }
       >
         <div className="flex flex-col gap-4">
-          <p className="text-sm">
+          <p className="text-body">
             Comptes, transactions, catégories, budgets, récurrences et objectifs seront <strong>définitivement effacés</strong>. Pense à
             faire une sauvegarde JSON avant.
           </p>

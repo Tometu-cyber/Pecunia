@@ -7,7 +7,7 @@ import { formatCents, formatPercent } from "@/lib/domain/money";
 import { balanceSeriesFromCurrent, expensesByCategory, summarize, topPlaces } from "@/lib/domain/stats";
 import { MonthSwitcher } from "@/components/app/filters";
 import { BalanceArea, MonthlyBars } from "@/components/charts/charts";
-import { Card, CardHeader, EmptyState } from "@/components/ui/primitives";
+import { Card, CardHeader, EmptyState, PageHeader } from "@/components/ui/primitives";
 import { CategoryPicker } from "./category-picker";
 
 export const metadata = { title: "Analyses" };
@@ -54,25 +54,23 @@ export default async function AnalysesPage({ searchParams }: { searchParams: Pro
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2 pr-12 lg:pr-0">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-n-600">Analyses</p>
-        <MonthSwitcher path="/analyses" month={month} current={current} params={{ categorie: params.categorie }} />
-      </div>
+      <PageHeader kicker="Tendances" title="Analyses" />
+      <MonthSwitcher path="/analyses" month={month} current={current} params={{ categorie: params.categorie }} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
-          <p className="text-xs font-semibold text-n-700">Taux d&apos;épargne</p>
-          <p className="mt-1 text-3xl font-extrabold tabular-nums text-accent-700">
+          <p className="text-sub font-semibold text-label-secondary">Taux d&apos;épargne</p>
+          <p className="mt-1 text-stat-hero text-finances-text">
             {summary.savingsRate === null ? "-" : formatPercent(summary.savingsRate)}
           </p>
-          <p className="text-[11px] text-n-600">
+          <p className="text-foot text-label-secondary">
             {formatCents(summary.netCents, "always")} sur {formatCents(summary.incomeCents)} d&apos;entrées en {monthName(month)}
           </p>
         </Card>
         <Card className="lg:col-span-2">
           <div className="flex items-baseline justify-between gap-3">
-            <p className="text-xs font-semibold text-n-700">Patrimoine</p>
-            <p className="text-2xl font-extrabold tabular-nums">{formatCents(netWorth)}</p>
+            <p className="text-sub font-semibold text-label-secondary">Patrimoine</p>
+            <p className="text-stat">{formatCents(netWorth)}</p>
           </div>
           <BalanceArea data={netWorthSeries} height={110} />
         </Card>
@@ -80,22 +78,23 @@ export default async function AnalysesPage({ searchParams }: { searchParams: Pro
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
-          <CardHeader title="Vs le mois dernier" />
+          <CardHeader title="Par rapport au mois dernier" />
           {comparison.length === 0 ? (
             <EmptyState>Aucune dépense ce mois-ci ni le mois précédent.</EmptyState>
           ) : (
-            <ul className="flex flex-col gap-2 text-sm">
+            <ul className="flex flex-col gap-2 text-body">
               {comparison.map((c) => {
                 const cat = c.categoryId ? categoryById.get(c.categoryId) : undefined;
                 const up = c.currentCents > c.previousCents;
                 return (
                   <li key={c.categoryId ?? "none"} className="flex items-center gap-2">
-                    <span className="size-2 rounded-full" style={{ backgroundColor: cat?.color ?? "#98a1b0" }} />
+                    <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: cat?.color ?? "var(--gray)" }} />
                     <span className="flex-1 truncate">{cat?.name ?? "Sans catégorie"}</span>
-                    <span className="text-xs text-n-600 tabular-nums">
+                    <span className="text-foot text-label-secondary tabular-nums">
                       {formatCents(c.previousCents)} → {formatCents(c.currentCents)}
                     </span>
-                    <span className={clsx("w-16 text-right text-xs font-bold tabular-nums", up ? "text-danger-700" : "text-accent-700")}>
+                    {/* une hausse de dépense n'est pas une erreur : pas de rouge (réservé aux erreurs) */}
+                    <span className={clsx("w-16 text-right text-foot font-semibold tabular-nums", up ? "text-label" : "text-finances-text")}>
                       {c.change === null ? "nouveau" : `${up ? "+" : ""}${formatPercent(c.change, 0)}`}
                     </span>
                   </li>
@@ -110,7 +109,7 @@ export default async function AnalysesPage({ searchParams }: { searchParams: Pro
           {savings.length === 0 ? (
             <EmptyState>Aucun compte d&apos;épargne.</EmptyState>
           ) : (
-            <ul className="flex flex-col gap-3 text-sm">
+            <ul className="flex flex-col gap-3 text-body">
               {savings.map((s) => (
                 <li key={s.account.id}>
                   <div className="flex items-center justify-between gap-2">
@@ -118,13 +117,13 @@ export default async function AnalysesPage({ searchParams }: { searchParams: Pro
                       <span className="size-2 rounded-full" style={{ backgroundColor: s.account.color }} />
                       {s.account.name}
                     </span>
-                    <span className="font-bold tabular-nums">{formatCents(s.totalCents, "always")}</span>
+                    <span className="font-semibold tabular-nums">{formatCents(s.totalCents, "always")}</span>
                   </div>
-                  <div className="mt-1.5 flex h-2 overflow-hidden rounded-full bg-n-200">
+                  <div className="mt-1.5 flex h-1.5 overflow-hidden rounded-full bg-fill-primary">
                     <div style={{ width: `${(Math.max(0, s.transfersCents) / savingsMax) * 100}%`, backgroundColor: s.account.color }} />
-                    <div className="bg-accent" style={{ width: `${(Math.max(0, s.interestCents) / savingsMax) * 100}%` }} />
+                    <div className="bg-finances" style={{ width: `${(Math.max(0, s.interestCents) / savingsMax) * 100}%` }} />
                   </div>
-                  <p className="mt-1 text-[11px] text-n-600">
+                  <p className="mt-1 text-foot text-label-secondary">
                     Virements nets {formatCents(s.transfersCents, "always")} · intérêts {formatCents(s.interestCents)}
                   </p>
                 </li>
@@ -137,7 +136,7 @@ export default async function AnalysesPage({ searchParams }: { searchParams: Pro
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card>
           <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-[11px] font-bold uppercase tracking-wider text-n-700">Évolution d&apos;une catégorie · 12 mois</h2>
+            <h2 className="text-heading">Évolution d&apos;une catégorie · 12 mois</h2>
             <CategoryPicker categories={expenseCategories.map((c) => ({ id: c.id, name: c.name }))} value={categoryId} />
           </div>
           {series.length > 0 ? <MonthlyBars data={series} /> : <EmptyState>Aucune catégorie de dépense.</EmptyState>}
@@ -149,14 +148,14 @@ export default async function AnalysesPage({ searchParams }: { searchParams: Pro
           ) : (
             <ol className="flex flex-col gap-2.5">
               {places.map((p, i) => (
-                <li key={p.place} className="flex items-center gap-3 text-sm">
-                  <span className="w-4 text-xs text-n-600">{i + 1}</span>
+                <li key={p.place} className="flex items-center gap-3 text-body">
+                  <span className="w-4 text-foot text-label-secondary">{i + 1}</span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold">{p.place}</p>
-                    <p className="text-[11px] text-n-600">
+                    <p className="truncate">{p.place}</p>
+                    <p className="text-foot text-label-secondary">
                       {p.count} passage{p.count > 1 ? "s" : ""}
                     </p>
-                    <div className="mt-1 h-1 rounded-full bg-accent-500" style={{ width: `${(p.cents / places[0]!.cents) * 100}%` }} />
+                    <div className="mt-1 h-1.5 rounded-full bg-finances" style={{ width: `${(p.cents / places[0]!.cents) * 100}%` }} />
                   </div>
                   <span className="font-semibold tabular-nums">{formatCents(p.cents)}</span>
                 </li>

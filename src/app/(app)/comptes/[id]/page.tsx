@@ -10,8 +10,7 @@ import { formatCents } from "@/lib/domain/money";
 import { balanceSeriesFromCurrent, groupByDay, signedTotal, summarize } from "@/lib/domain/stats";
 import { shortAccountName } from "@/lib/domain/accounts";
 import { BalanceArea } from "@/components/charts/charts";
-import { IconBadge } from "@/components/ui/icons";
-import { Card, Chip, EmptyState } from "@/components/ui/primitives";
+import { Card, Chip, EmptyState, PageHeader, cardLinkClass } from "@/components/ui/primitives";
 import { AccountSettings, AdjustBalanceButton } from "@/components/accounts/account-dialogs";
 import { GoalCard } from "@/components/accounts/goals-section";
 import { AccountTransactions } from "./account-transactions";
@@ -35,68 +34,60 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
   const active = accounts.filter((a) => !a.archivedAt);
 
   const stats = [
-    { label: "Entrées", value: summary.incomeCents, cls: "text-accent-700" },
+    { label: "Entrées", value: summary.incomeCents, cls: "text-finances-text" },
     { label: "Sorties", value: summary.expenseCents, cls: "" },
     { label: "Virements nets", value: transfersNet, cls: "", signed: true },
   ];
 
+  const meta = `${ACCOUNT_TYPE_LABELS[account.type]} · ${account.inBudget ? "dans le budget" : "hors budget"} · solde initial ${formatCents(account.initialBalanceCents)} au ${numericDate(account.initialBalanceDate)}${account.archivedAt ? " · archivé" : ""}`;
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 pr-12 lg:pr-0">
-        <Link href="/comptes" className="text-xs font-bold text-accent-700">
-          ‹ Tous les comptes
-        </Link>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <IconBadge icon={account.icon} color={account.color} size="lg" />
-            <div>
-              <h1 className="text-3xl font-extrabold md:text-4xl">{account.name}</h1>
-              <p className="text-xs text-n-600">
-                {ACCOUNT_TYPE_LABELS[account.type]} · {account.inBudget ? "dans le budget" : "hors budget"} · solde initial{" "}
-                {formatCents(account.initialBalanceCents)} au {numericDate(account.initialBalanceDate)}
-                {account.archivedAt && " · archivé"}
-              </p>
+      <PageHeader
+        back={{ href: "/comptes", label: "Comptes" }}
+        title={account.name}
+        subtitle={meta}
+        center={
+          active.length > 1 ? (
+            <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
+              {active.map((a) => (
+                <Chip key={a.id} active={a.id === id} href={`/comptes/${a.id}`}>
+                  {shortAccountName(a)}
+                </Chip>
+              ))}
             </div>
-          </div>
-          <div className="no-scrollbar hidden gap-2 overflow-x-auto md:flex">
-            {active.map((a) => (
-              <Chip key={a.id} active={a.id === id} href={`/comptes/${a.id}`}>
-                {shortAccountName(a)}
-              </Chip>
-            ))}
-          </div>
-        </div>
-      </div>
+          ) : undefined
+        }
+      />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
         <Card>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-n-700">Solde actuel</p>
-              <p className="text-4xl font-extrabold tabular-nums">{formatCents(balance)}</p>
+              <p className="text-sub font-semibold text-label-secondary">Solde actuel</p>
+              <p className="text-stat-hero font-bold tabular-nums">{formatCents(balance)}</p>
             </div>
             <AdjustBalanceButton account={account} balanceCents={balance} />
           </div>
           <div className="mt-3">
-            <BalanceArea data={months.map((m, i) => ({ label: monthAbbr(m), cents: series[i]! }))} color={account.color} />
+            <BalanceArea data={months.map((m, i) => ({ label: monthAbbr(m), cents: series[i]! }))} />
           </div>
-          <div className="mt-3 grid grid-cols-3 border-t border-divider pt-3 lg:hidden">
+          <div className="mt-3 grid grid-cols-3 border-t border-separator pt-3 lg:hidden">
             {stats.map((s) => (
               <div key={s.label}>
-                <p className="text-xs text-n-600">{s.label}</p>
-                <p className={`font-bold tabular-nums ${s.cls}`}>{formatCents(s.value, s.signed ? "always" : "auto")}</p>
+                <p className="text-foot text-label-secondary">{s.label}</p>
+                <p className={`font-rounded text-[20px] leading-[25px] font-semibold tabular-nums ${s.cls}`}>{formatCents(s.value, s.signed ? "always" : "auto")}</p>
               </div>
             ))}
           </div>
         </Card>
         <div className="flex flex-col gap-4">
           <Card className="hidden lg:block">
-            <h2 className="mb-2 text-[11px] font-bold uppercase tracking-wider text-n-700">{monthName(current)}</h2>
-            <dl className="flex flex-col gap-1.5 text-sm">
+            <h2 className="mb-2 text-heading">{monthName(current)}</h2>
+            <dl className="flex flex-col gap-1.5 text-body">
               {stats.map((s) => (
                 <div key={s.label} className="flex justify-between">
-                  <dt className="text-n-700">{s.label}</dt>
-                  <dd className={`font-bold tabular-nums ${s.cls}`}>{formatCents(s.value, s.signed ? "always" : "auto")}</dd>
+                  <dt className="text-label-secondary">{s.label}</dt>
+                  <dd className={`font-semibold tabular-nums ${s.cls}`}>{formatCents(s.value, s.signed ? "always" : "auto")}</dd>
                 </div>
               ))}
             </dl>
@@ -115,11 +106,11 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <h2 className="text-lg font-extrabold">Transactions du compte</h2>
+        <h2 className="text-heading">Transactions du compte</h2>
         <div className="flex items-center gap-3">
-          <span className="whitespace-nowrap text-xs text-n-600">{monthTxs.length} ce mois-ci</span>
+          <span className="whitespace-nowrap text-foot text-label-secondary">{monthTxs.length} ce mois-ci</span>
           {!account.archivedAt && (
-            <Link href={`/import?compte=${account.id}`} className="text-xs font-bold text-accent-700 hover:text-accent">
+            <Link href={`/import?compte=${account.id}`} className={cardLinkClass}>
               Importer un CSV
             </Link>
           )}

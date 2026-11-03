@@ -1,12 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo } from "next/font/google";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { THEME_COOKIE } from "@/lib/theme";
 import { NavigationProgress } from "@/components/ui/navigation-progress";
 import "./globals.css";
-
-const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Pecunia", template: "%s · Pecunia" },
@@ -18,14 +15,18 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#148270",
+  // fond des écrans en listes groupées (bg-grouped), clair et sombre
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f2f2f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const theme = (await cookies()).get(THEME_COOKIE)?.value === "dark" ? "dark" : "light";
   return (
-    <html lang="fr" data-theme={theme} className={archivo.variable}>
-      <body className="min-h-dvh font-sans">
+    <html lang="fr" data-theme={theme}>
+      <body className="min-h-dvh">
         <Suspense fallback={null}>
           <NavigationProgress />
         </Suspense>

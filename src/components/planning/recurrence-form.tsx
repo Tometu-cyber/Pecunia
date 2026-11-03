@@ -130,7 +130,7 @@ export function RecurrenceFormModal({
             { value: "transfer", label: "⇄ Virement" },
           ]}
         />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 [&>*]:min-w-0">
           <div className="col-span-2 sm:col-span-1">
             <Label htmlFor="rec-label">Libellé</Label>
             <Input id="rec-label" value={draft.label} onChange={(e) => set({ label: e.target.value })} placeholder="Loyer, Netflix, Salaire…" />
@@ -209,12 +209,12 @@ export function RecurrenceFormModal({
           </div>
         </div>
         {draft.type === "out" && (
-          <label className="flex items-center gap-2 text-sm font-semibold">
+          <label className="flex min-h-11 items-center gap-3 text-body md:min-h-7">
             <input type="checkbox" checked={draft.isSubscription} onChange={(e) => set({ isSubscription: e.target.checked })} />
             Abonnement
           </label>
         )}
-        <p className="text-xs text-n-600">
+        <p className="text-foot text-label-secondary">
           {draft.frequency === "weekly"
             ? "Une échéance tous les 7 jours à partir de la date de début."
             : "Si le jour n'existe pas dans le mois (ex. 31), l'échéance tombe le dernier jour du mois."}

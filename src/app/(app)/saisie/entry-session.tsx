@@ -36,20 +36,20 @@ export function EntrySession() {
       </Card>
       <div className="flex flex-col gap-4">
         <Card>
-          <CardHeader title="Cette session" action={<span className="text-xs text-n-600">{entries.length} saisie{entries.length > 1 ? "s" : ""}</span>} />
+          <CardHeader title="Cette session" action={<span className="text-foot text-label-secondary">{entries.length} saisie{entries.length > 1 ? "s" : ""}</span>} />
           {entries.length === 0 ? (
-            <p className="text-sm text-n-600">Les mouvements validés apparaîtront ici.</p>
+            <p className="text-body text-label-secondary">Les mouvements validés apparaîtront ici.</p>
           ) : (
-            <ul className="divide-y divide-divider">
+            <ul className="divide-y-[0.5px] divide-separator">
               {entries.map((e) => (
-                <li key={e.key} className="flex items-center justify-between gap-2 py-2 text-sm">
+                <li key={e.key} className="flex min-h-11 items-center justify-between gap-2 py-2 text-body">
                   <div className="min-w-0">
-                    <p className="truncate font-bold">{e.label}</p>
-                    <p className="text-[11px] text-n-600">
+                    <p className="truncate">{e.label}</p>
+                    <p className="text-sub text-label-secondary">
                       {[shortDate(e.date), e.categoryName, e.accountName].filter(Boolean).join(" · ")}
                     </p>
                   </div>
-                  <span className="tabular-nums">{e.amount}</span>
+                  <span className="font-semibold tabular-nums">{e.amount}</span>
                 </li>
               ))}
             </ul>
@@ -57,19 +57,19 @@ export function EntrySession() {
         </Card>
         <Card>
           <CardHeader title="Soldes à jour" />
-          <ul className="flex flex-col gap-2 text-sm">
+          <ul className="flex flex-col gap-2 text-body">
             {activeAccounts.map((a) => (
               <li key={a.id} className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2">
-                  <span className="size-2 rounded-full" style={{ backgroundColor: a.color }} />
+                  <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: a.color }} />
                   {a.name}
                 </span>
-                <span className="font-bold tabular-nums">{formatCents(balances[a.id] ?? 0)}</span>
+                <span className="font-semibold tabular-nums">{formatCents(balances[a.id] ?? 0)}</span>
               </li>
             ))}
           </ul>
         </Card>
-        <p className="px-1 text-[11px] text-n-600">
+        <p className="px-1 text-foot text-label-secondary">
           Raccourcis : <strong>Entrée</strong> valide · <strong>Tab</strong> champ suivant · catégorie et compte repris du dernier
           passage au même endroit.
         </p>
