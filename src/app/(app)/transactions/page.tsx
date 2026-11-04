@@ -1,5 +1,5 @@
 import { Plus, Upload } from "lucide-react";
-import { getAppData, getProfile, getTransactions } from "@/lib/data/queries";
+import { getAccounts, getProfile, getTransactions } from "@/lib/data/queries";
 import { resolveMonth } from "@/lib/data/views";
 import { monthPeriod } from "@/lib/domain/dates";
 import { MonthSwitcher } from "@/components/app/filters";
@@ -18,7 +18,7 @@ export default async function TransactionsPage({
   const profile = await getProfile();
   const { month, current } = resolveMonth(params.mois, profile.monthStartDay);
   const period = monthPeriod(month, profile.monthStartDay);
-  const [{ accounts }, txs] = await Promise.all([getAppData(), getTransactions({ from: period.start, to: period.end })]);
+  const [accounts, txs] = await Promise.all([getAccounts(), getTransactions({ from: period.start, to: period.end })]);
   const initialAccount = accounts.some((a) => a.id === params.compte) ? params.compte! : null;
 
   const importHref = initialAccount ? `/import?compte=${initialAccount}` : "/import";

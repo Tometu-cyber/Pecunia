@@ -203,6 +203,25 @@ export const getGoals = cache(async (): Promise<Goal[]> => {
   return data.map(toGoal);
 });
 
+const LOADERS = {
+  accounts: getAccounts,
+  categories: getCategories,
+  balances: getBalances,
+  recurrences: getRecurrences,
+  forecastItems: getForecastItems,
+};
+type Loaded = { [K in keyof typeof LOADERS]: Awaited<ReturnType<(typeof LOADERS)[K]>> };
+
+/**
+ * Seulement les données communes dont un écran a besoin, lues en parallèle. Changer de
+ * mois ou de filtre ne relance que la page (pas le layout) : inutile d'y relire la mémoire
+ * des lieux ou les dépenses prévues si l'écran ne s'en sert pas.
+ */
+export async function loadData<K extends keyof Loaded>(...keys: K[]): Promise<Pick<Loaded, K>> {
+  const values = await Promise.all(keys.map((k) => LOADERS[k]()));
+  return Object.fromEntries(keys.map((k, i) => [k, values[i]])) as Pick<Loaded, K>;
+}
+
 /** Données communes à toutes les pages de l'application (layout). */
 export const getAppData = cache(async () => {
   // Tout en parallèle : comptes et catégories attendent d'eux-mêmes une éventuelle 1re initialisation.

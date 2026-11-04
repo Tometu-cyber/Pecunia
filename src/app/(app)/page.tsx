@@ -1,4 +1,4 @@
-import { getAppData, getForecastDecisions, getProfile, getTransactions } from "@/lib/data/queries";
+import { getForecastDecisions, getProfile, getTransactions, loadData } from "@/lib/data/queries";
 import { getBudgetOverview, resolveMonth, withParams } from "@/lib/data/views";
 import { addMonths, isInPeriod, lastMonths, monthAbbr, monthKeyOf, monthLabel, monthPeriod, todayIso } from "@/lib/domain/dates";
 import { recurrenceKey } from "@/lib/domain/forecast";
@@ -27,7 +27,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const windowStart = monthPeriod(months[0]!, startDay).start;
   const today = todayIso();
   const [{ accounts, categories, balances, recurrences, forecastItems }, txs, decisions] = await Promise.all([
-    getAppData(),
+    loadData("accounts", "categories", "balances", "recurrences", "forecastItems"),
     // Depuis le début de la fenêtre de 12 mois jusqu'à aujourd'hui (sparklines reconstruites à rebours)
     getTransactions({ from: windowStart }),
     getForecastDecisions(monthKeyOf(today, startDay)),

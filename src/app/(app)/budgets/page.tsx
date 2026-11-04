@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { getAppData, getBudgets } from "@/lib/data/queries";
+import { getAccounts, getBudgets, getCategories, getProfile } from "@/lib/data/queries";
 import { getBudgetOverview, resolveMonth } from "@/lib/data/views";
 import { budgetAccountIds } from "@/lib/domain/budgets";
 import { formatCents, formatPercent } from "@/lib/domain/money";
@@ -14,7 +14,7 @@ export const metadata = { title: "Budgets" };
 
 export default async function BudgetsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
-  const { profile, accounts, categories } = await getAppData();
+  const [profile, accounts, categories] = await Promise.all([getProfile(), getAccounts(), getCategories()]);
   const { month, current } = resolveMonth(params.mois, profile.monthStartDay);
   const [overview, budgets] = await Promise.all([getBudgetOverview(month), getBudgets()]);
   const accountById = new Map(accounts.map((a) => [a.id, a]));

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAppData, getGoals, getProfile, getTransactions } from "@/lib/data/queries";
+import { getGoals, getProfile, getTransactions, loadData } from "@/lib/data/queries";
 import { goalStatus } from "@/lib/domain/goals";
 import { todayIso } from "@/lib/domain/dates";
 import { resolveMonth } from "@/lib/data/views";
@@ -23,7 +23,7 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
   const months = lastMonths(current, 12);
   const period = monthPeriod(current, startDay);
   const [{ accounts, balances, recurrences }, goals, txs] = await Promise.all([
-    getAppData(),
+    loadData("accounts", "balances", "recurrences"),
     getGoals(),
     getTransactions({ accountId: id, from: monthPeriod(months[0]!, startDay).start }),
   ]);

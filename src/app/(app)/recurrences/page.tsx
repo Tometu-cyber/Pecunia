@@ -1,4 +1,4 @@
-import { getAppData, getProfile, getTransactions } from "@/lib/data/queries";
+import { getProfile, getRecurrences, getTransactions } from "@/lib/data/queries";
 import { addMonths, monthKeyOf, monthPeriod, todayIso } from "@/lib/domain/dates";
 import { buildOccurrences, isActiveOn, monthlyEquivalentCents, occurrenceWindow } from "@/lib/domain/recurrences";
 import { PageHeader } from "@/components/ui/primitives";
@@ -14,7 +14,7 @@ export default async function RecurrencesPage() {
   const from = monthPeriod(current, profile.monthStartDay).start;
   const to = monthPeriod(addMonths(current, 2), profile.monthStartDay).end;
   const range = occurrenceWindow(from, to);
-  const [{ recurrences }, txs] = await Promise.all([getAppData(), getTransactions({ from: range.from, to: range.to })]);
+  const [recurrences, txs] = await Promise.all([getRecurrences(), getTransactions({ from: range.from, to: range.to })]);
   const occurrences = buildOccurrences(recurrences, txs, from, to);
 
   const subscriptions = recurrences.filter((r) => r.isSubscription && isActiveOn(r, today));

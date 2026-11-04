@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { clsx } from "clsx";
 import { TriangleAlert } from "lucide-react";
-import { getAppData, getForecastDecisions, getProfile, getTransactions } from "@/lib/data/queries";
+import { getForecastDecisions, getProfile, getTransactions, loadData } from "@/lib/data/queries";
 import { getBudgetOverview, withParams } from "@/lib/data/views";
 import { addMonths, monthAbbr, monthKeyOf, monthName, monthPeriod, todayIso } from "@/lib/domain/dates";
 import { buildForecast, plannedEffects, proposalEffects } from "@/lib/domain/forecast";
@@ -29,7 +29,7 @@ export default async function ForecastPage({ searchParams }: { searchParams: Pro
   const to = monthPeriod(addMonths(current, horizon - 1), startDay).end;
   const range = occurrenceWindow(from, to);
   const [{ accounts, balances, recurrences, forecastItems }, txs, budgets, decisions] = await Promise.all([
-    getAppData(),
+    loadData("accounts", "balances", "recurrences", "forecastItems"),
     getTransactions({ from: range.from, to: range.to }),
     getBudgetOverview(current),
     getForecastDecisions(current),
