@@ -57,9 +57,9 @@ Le principe en une phrase : **un socle commun pour tout le portail, et un style 
 - **Feuilles modales** : arrondi `radius-xl` en haut, voile `glass-dim` derrière.
 
 **Règles Apple à respecter :**
-- Zone tactile de **44 × 44 px minimum** (`hit-target`), même si l'icône est plus petite.
+- Zone tactile de **44 × 44 px minimum** (`hit-target`), même si l'icône est plus petite. Sous 768 px, les contrôles compacts (`Button` et `GlassButton` en `small`, segments du `SegmentedControl`, bouton du `DatePicker`, flèches du calendrier) gardent leur taille visible, mais une zone invisible centrée (`::after`) agrandit la cible à 44 × 44 px.
 - Corps de texte à **17 px** (`ios-body`). Rien en dessous de 11 px.
-- Les libellés de la barre d'onglets sont en `ios-caption-2`, l'onglet actif en `tint` (ou `<app>` dans une app).
+- Les libellés de la barre d'onglets sont en `ios-caption-2`, l'onglet actif en `tint` (ou `<app>-text` dans une app : la couleur pleine n'est pas assez contrastée sur le verre clair).
 - Pas de texte coloré sur le verre : `label` ou `label-secondary`.
 
 ## 4. Ordinateur : style macOS
@@ -158,6 +158,7 @@ Les composants sont en React 18 (`window.Portail`) et ne lisent que les tokens.
 | `List` / `ListRow` | Liste groupée façon Réglages, lignes avec valeur | Partout |
 | `Button` | Bouton dans le contenu : plein, teinté, gris, simple | Cartes, formulaires |
 | `TextField` | Champ de saisie, recherche, erreur | Formulaires, barres d'outils |
+| `Select` | Liste déroulante à l'apparence d'un champ, liste en verre | Formulaires, tableaux |
 | `Menu` | Menu déroulant en verre : choisir une valeur ou lancer une action | Filtres, tris, actions « … » |
 | `SegmentedControl` | 2 à 5 choix côte à côte, pastille qui glisse | Périodes, types, vues |
 | `Toggle` | Interrupteur façon iOS 26 | Réglages, options |
@@ -167,6 +168,14 @@ Les composants sont en React 18 (`window.Portail`) et ne lisent que les tokens.
 | `LineChart` | Graphique en courbe avec suivi au survol | Solde, poids, tendances |
 
 Le style d'une app s'applique avec la classe `pt-app-<app>` sur un conteneur : elle redéfinit `--app`, `--app-text`, `--app-bg` et `--on-app` pour tout ce qu'il contient.
+
+**Liens :** `ListRow`, `Button`, `GlassButton`, les items de `Menu`, `TabBar` et `Sidebar` acceptent un `href` et se rendent alors en `<a>`, avec les mêmes styles qu'en bouton. Pour utiliser le lien de l'app (Next.js `Link`, React Router…), appeler une fois `Portail.setLinkComponent(Link)`, ou passer `linkAs` à un composant.
+
+**Mise en page de l'app :**
+- `pt-tabbar-dock` : conteneur fixe de la `TabBar`, en bas, à `space-4` des bords, au-dessus de `safe-area-inset-bottom`.
+- `pt-sidebar-dock` : conteneur fixe de la `Sidebar`, décollée de 8 px, pleine hauteur.
+- `pt-list-inset` : sur un `<ul>` de lignes libres, des séparateurs de 0,5 px qui commencent au niveau du texte.
+- Jauges `pt-tile-bar` en variantes `is-warn` et `is-over`.
 
 **Écrans de référence :**
 - `HomeMobile` et `HomeDesktop` : l'accueil du portail, sur iPhone et sur Mac.

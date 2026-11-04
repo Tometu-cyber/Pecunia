@@ -9,7 +9,7 @@ Le contrôle segmenté d'iOS : 2 à 5 choix côte à côte dans une capsule gris
 - `value` / `defaultValue` / `onChange(id)`.
 - `label` : nom du groupe pour les lecteurs d'écran (« Période »).
 - `full` : pleine largeur, segments égaux (mobile).
-- `size` : `regular` (36 px, mobile) ou `small` (28 px, ordi).
+- `size` : `regular` (36 px, mobile), `small` (28 px, ordi) ou `auto` : regular sous 768 px et small au-delà, sans que l'app ait à choisir.
 
 **Comportement :** les flèches gauche et droite changent de choix directement, comme des boutons radio. Début et Fin vont au premier et au dernier choix. Le rebond est coupé si « Réduire les animations » est activé.
 
@@ -17,3 +17,5 @@ Le contrôle segmenté d'iOS : 2 à 5 choix côte à côte dans une capsule gris
 - Libellés d'un mot, de longueur proche.
 - Ne pas mélanger texte et pictogrammes dans le même contrôle.
 - Un seul contrôle segmenté par vue, en haut du contenu qu'il filtre.
+
+**Sur mobile :** chaque segment garde sa hauteur visible, mais sa zone tactile fait au moins 44 px de haut.

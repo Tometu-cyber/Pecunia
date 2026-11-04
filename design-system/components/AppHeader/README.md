@@ -18,9 +18,11 @@ Le flou apparaît dès qu'on fait défiler.
 **Props :**
 - `title`, `subtitle`, `eyebrow` (mobile : la petite ligne colorée au-dessus du titre).
 - `app` : couleur de l'eyebrow et du bouton d'action principal.
-- `back` : `{ label, onClick }`, bouton retour (vers le portail).
+- `back` : `{ label, onClick, href? }`, bouton retour (vers le portail).
 - `actions` : liste de props de `GlassButton` (`{ icon, label, prominent?, children?, onClick }`), ou `{ menu: {…props de Menu} }` pour un menu « … ». Une seule action `prominent` (pleine, à la couleur de l'app).
 - `platform` : `'ios'` (par défaut) ou `'mac'`. `center` : élément au centre de la barre d'outils (ordi).
+- `trailing` : éléments libres placés avant les actions, à droite (un `Select` de compte, un avatar…).
+- `linkAs` : composant de lien pour `back.href` et les actions avec `href`.
 
 **Mise en place :**
 - Mettre l'en-tête en premier dans la zone qui défile : il détecte tout seul le défilement.

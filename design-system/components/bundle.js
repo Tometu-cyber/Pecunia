@@ -1,7 +1,13 @@
-/* @ds-bundle: {"format":4,"namespace":"Portail","components":[{"name":"AppIcon"},{"name":"AppTile"},{"name":"GlassButton"},{"name":"TabBar"},{"name":"Sidebar"},{"name":"Icon"},{"name":"Card"},{"name":"List"},{"name":"ListRow"},{"name":"Button"},{"name":"TextField"},{"name":"ProgressRing"},{"name":"BarChart"},{"name":"Menu"},{"name":"SegmentedControl"},{"name":"Toggle"},{"name":"DatePicker"},{"name":"AppHeader"},{"name":"Sheet"},{"name":"LineChart"}]} */
+/* @ds-bundle: {"format":4,"namespace":"Portail","components":[{"name":"AppIcon"},{"name":"AppTile"},{"name":"GlassButton"},{"name":"TabBar"},{"name":"Sidebar"},{"name":"Icon"},{"name":"Card"},{"name":"List"},{"name":"ListRow"},{"name":"Button"},{"name":"TextField"},{"name":"ProgressRing"},{"name":"BarChart"},{"name":"Menu"},{"name":"SegmentedControl"},{"name":"Toggle"},{"name":"DatePicker"},{"name":"AppHeader"},{"name":"Sheet"},{"name":"LineChart"},{"name":"Select"}]} */
 (function () {
   var React = window.React;
   var h = React.createElement;
+
+  /* Liens : un composant avec `href` se rend en <a>, ou avec le composant de lien de l'app
+     (Next.js Link, React Router Link…) passé à Portail.setLinkComponent ou en prop `linkAs`. */
+  var linkComponent = null;
+  function setLinkComponent(C) { linkComponent = C || null; }
+  function linkTag(p) { return (p && p.linkAs) || linkComponent || 'a'; }
 
   function cx() {
     var out = [];
@@ -178,41 +184,135 @@
 
   function GlassButton(props) {
     var iconOnly = props.icon && !props.children;
+    var cls = cx('pt-root', 'pt-gbtn', 'pt-app-' + (props.app || 'portail'),
+      props.prominent ? 'pt-gbtn-prominent' : 'pt-glass',
+      props.size === 'small' && 'pt-gbtn-small',
+      iconOnly && 'pt-gbtn-icon', props.className);
+    var content = [
+      props.icon ? h(Icon, { key: 'i', name: props.icon, size: props.size === 'small' ? 16 : 22 }) : null,
+      props.children != null ? h('span', { key: 'l', className: 'pt-label' }, props.children) : null
+    ];
+    var aria = iconOnly ? props.label : undefined;
+    if (props.href) {
+      if (props.disabled) return h('span', { className: cls, role: 'link', 'aria-disabled': 'true', 'aria-label': aria }, content);
+      return h(linkTag(props), { href: props.href, className: cls, onClick: props.onClick, 'aria-label': aria }, content);
+    }
     return h('button', {
-      type: props.type || 'button',
-      className: cx('pt-root', 'pt-gbtn', 'pt-app-' + (props.app || 'portail'),
-        props.prominent ? 'pt-gbtn-prominent' : 'pt-glass',
-        props.size === 'small' && 'pt-gbtn-small',
-        iconOnly && 'pt-gbtn-icon', props.className),
-      onClick: props.onClick,
-      'aria-label': iconOnly ? props.label : undefined
-    },
-      props.icon ? h(Icon, { name: props.icon, size: props.size === 'small' ? 16 : 22 }) : null,
-      props.children != null ? h('span', { className: 'pt-label' }, props.children) : null
-    );
+      type: props.type || 'button', className: cls,
+      onClick: props.disabled ? undefined : props.onClick,
+      'aria-disabled': props.disabled ? 'true' : undefined,
+      'aria-label': aria
+    }, content);
   }
+
+  /* Déplacement (px) au-delà duquel un toucher sur la barre devient un glissé. */
+  var TAB_DRAG_THRESHOLD = 8;
 
   function TabBar(props) {
     var items = props.items || [];
     var st = React.useState(props.defaultActive || (items[0] && items[0].id));
-    var active = props.active != null ? props.active : st[0];
+    var ps = React.useState(null); /* onglet choisi au doigt, affiché pendant la navigation */
+    var pending = ps[0], setPending = ps[1];
+    var active = pending != null ? pending : (props.active != null ? props.active : st[0]);
+    var draggable = !!props.draggable;
+    var navRef = React.useRef(null), tabRefs = React.useRef([]), gesture = React.useRef(null);
+    var rs = React.useState([]), rects = rs[0], setRects = rs[1];
+    var ds = React.useState(null), drag = ds[0], setDrag = ds[1];
+
+    React.useEffect(function () { setPending(null); }, [props.active]);
+    React.useLayoutEffect(function () {
+      if (!draggable) return;
+      function measure() {
+        setRects(tabRefs.current.slice(0, items.length).map(function (el) { return el ? { left: el.offsetLeft, width: el.offsetWidth } : { left: 0, width: 0 }; }));
+      }
+      measure();
+      if (typeof ResizeObserver === 'undefined' || !navRef.current) return;
+      var ro = new ResizeObserver(measure);
+      ro.observe(navRef.current);
+      return function () { ro.disconnect(); };
+    }, [draggable, items.length]);
+
     function select(id) {
       if (props.active == null) st[1](id);
       if (props.onChange) props.onChange(id);
     }
+    function indexAt(x) {
+      var best = 0;
+      rects.forEach(function (r, i) { if (x >= r.left) best = i; });
+      return best;
+    }
+    function localX(e) { return e.clientX - navRef.current.getBoundingClientRect().left; }
+    function onDown(e) {
+      if (!e.isPrimary || e.button !== 0) return;
+      gesture.current = { id: e.pointerId, startX: e.clientX, dragging: false, over: indexAt(localX(e)) };
+    }
+    function onMove(e) {
+      var g = gesture.current;
+      if (!g || g.id !== e.pointerId) return;
+      if (!g.dragging) {
+        if (Math.abs(e.clientX - g.startX) < TAB_DRAG_THRESHOLD) return;
+        g.dragging = true; /* la barre garde le doigt, même en dehors */
+        e.currentTarget.setPointerCapture(e.pointerId);
+      }
+      var x = localX(e), over = indexAt(x);
+      if (over !== g.over) { g.over = over; if (navigator.vibrate) navigator.vibrate(8); }
+      setDrag({ x: x, over: over });
+    }
+    function onEnd(e, cancelled) {
+      var g = gesture.current;
+      gesture.current = null;
+      if (!g || g.id !== e.pointerId || !g.dragging) return;
+      setDrag(null);
+      if (cancelled) return;
+      var it = items[g.over];
+      if (!it || it.id === active) return;
+      if (navigator.vibrate) navigator.vibrate(10);
+      if (props.active != null) setPending(it.id); /* contrôlé : affiché tout de suite, en attendant la nouvelle page */
+      /* un vrai clic sur l'onglet : le lien (ou onChange) fait la navigation */
+      var el = tabRefs.current[g.over];
+      if (el) el.click(); else select(it.id);
+    }
+
+    var pill = null;
+    if (draggable && rects.length === items.length && rects.length) {
+      var ai = items.findIndex(function (it) { return it.id === active; });
+      var base = rects[ai] || rects[0];
+      if (drag) {
+        var first = rects[0], last = rects[rects.length - 1];
+        var w = (rects[drag.over] || base).width;
+        var left = Math.min(Math.max(drag.x - w / 2, first.left), last.left + last.width - w);
+        pill = { translate: left + 'px 0', width: w + 'px' };
+      } else if (ai >= 0) {
+        pill = { translate: base.left + 'px 0', width: base.width + 'px' };
+      }
+    }
+
     var bar = h('nav', {
-      className: cx('pt-tabbar', 'pt-glass'),
-      'aria-label': props.label || 'Navigation principale'
-    }, items.map(function (it) {
-      return h('button', {
-        key: it.id, type: 'button', className: 'pt-tab',
-        'aria-current': it.id === active ? 'page' : undefined,
-        onClick: function () { select(it.id); }
-      }, h(Icon, { name: it.icon, size: 24 }), h('span', null, it.label));
-    }));
+      ref: navRef,
+      className: cx('pt-tabbar', 'pt-glass', draggable && 'has-pill', drag && 'is-dragging'),
+      'aria-label': props.label || 'Navigation principale',
+      onPointerDown: draggable ? onDown : undefined,
+      onPointerMove: draggable ? onMove : undefined,
+      onPointerUp: draggable ? function (e) { onEnd(e, false); } : undefined,
+      onPointerCancel: draggable ? function (e) { onEnd(e, true); } : undefined
+    },
+      pill ? h('span', { className: 'pt-tab-pill', style: pill, 'aria-hidden': 'true' }) : null,
+      items.map(function (it, i) {
+        var common = {
+          key: it.id,
+          ref: function (el) { tabRefs.current[i] = el; },
+          className: cx('pt-tab', drag && drag.over === i && 'is-over'),
+          'aria-current': it.id === active ? 'page' : undefined,
+          onClick: function () { select(it.id); }
+        };
+        var content = [h(Icon, { key: 'i', name: it.icon, size: 24 }), h('span', { key: 'l' }, it.label)];
+        if (it.href) return h(linkTag(props), Object.assign({ href: it.href, draggable: false }, common), content);
+        return h('button', Object.assign({ type: 'button' }, common), content);
+      }));
+    var a = props.action;
     return h('div', { className: cx('pt-root', 'pt-tabbar-row', 'pt-app-' + (props.app || 'portail'), props.className) },
       bar,
-      props.action ? h(GlassButton, { icon: props.action.icon, label: props.action.label, onClick: props.action.onClick, app: props.app, prominent: props.action.prominent }) : null
+      a ? h(GlassButton, { icon: a.icon, label: a.label, onClick: a.onClick, href: a.href, linkAs: props.linkAs, app: props.app, prominent: a.prominent }) : null
     );
   }
 
@@ -226,7 +326,7 @@
       if (props.onSelect) props.onSelect(id);
     }
     return h('nav', {
-      className: cx('pt-root', 'pt-sidebar', 'pt-glass-thick', props.className),
+      className: cx('pt-root', 'pt-sidebar', 'pt-glass-thick', props.app && 'pt-app-' + props.app, props.className),
       'aria-label': props.label || 'Apps'
     },
       props.windowControls === false ? null : h('div', { className: 'pt-traffic', 'aria-hidden': 'true' }, h('span'), h('span'), h('span')),
@@ -234,18 +334,19 @@
         return h(React.Fragment, { key: sec.title || i },
           sec.title ? h('div', { className: 'pt-side-title' }, sec.title) : null,
           h('ul', { className: 'pt-side-list' }, sec.items.map(function (it) {
+            var common = {
+              className: cx('pt-side-item', it.app && 'pt-app-' + it.app),
+              'aria-current': it.id === active ? 'page' : undefined,
+              onClick: function () { select(it.id); }
+            };
+            var content = [
+              it.app ? h(AppIcon, { key: 'i', app: it.app, icon: it.icon, size: 20 }) : h(Icon, { key: 'i', name: it.icon, size: 18 }),
+              h('span', { key: 'l', className: 'pt-side-label' }, it.label),
+              it.badge != null ? h('span', { key: 'b', className: 'pt-side-badge' }, it.badge) : null
+            ];
             return h('li', { key: it.id },
-              h('button', {
-                type: 'button',
-                className: cx('pt-side-item', it.app && 'pt-app-' + it.app),
-                'aria-current': it.id === active ? 'page' : undefined,
-                onClick: function () { select(it.id); }
-              },
-                it.app ? h(AppIcon, { app: it.app, icon: it.icon, size: 20 }) : h(Icon, { name: it.icon, size: 18 }),
-                h('span', { className: 'pt-side-label' }, it.label),
-                it.badge != null ? h('span', { className: 'pt-side-badge' }, it.badge) : null
-              )
-            );
+              it.href ? h(linkTag(props), Object.assign({ href: it.href }, common), content)
+                      : h('button', Object.assign({ type: 'button' }, common), content));
           }))
         );
       }),
@@ -280,27 +381,37 @@
     var lead = null;
     if (props.appIcon) lead = h(AppIcon, { app: app, size: 30 });
     else if (props.icon) lead = h('span', { className: 'pt-row-lead' }, h(Icon, { name: props.icon, size: 17, strokeWidth: 2 }));
-    var Tag = props.onClick ? 'button' : 'div';
-    return h(Tag, { type: props.onClick ? 'button' : undefined, className: cx('pt-row', 'pt-app-' + app, !lead && 'pt-row-nolead', props.className), onClick: props.onClick },
+    var interactive = !!(props.href || props.onClick);
+    var Tag = props.href ? linkTag(props) : props.onClick ? 'button' : 'div';
+    return h(Tag, { type: !props.href && props.onClick ? 'button' : undefined, href: props.href, className: cx('pt-row', 'pt-app-' + app, !lead && 'pt-row-nolead', props.className), onClick: props.onClick },
       lead,
       h('span', { className: 'pt-row-text' },
         h('span', { className: 'pt-row-title' }, props.title),
         props.subtitle ? h('span', { className: 'pt-row-sub' }, props.subtitle) : null),
       props.value != null ? h('span', { className: cx('pt-row-value', props.tone && 'pt-tone-' + props.tone) }, props.value) : null,
-      props.onClick && props.chevron !== false ? h(Icon, { name: 'chevron', size: 16, strokeWidth: 2.2, className: 'pt-row-chev' }) : null
+      interactive && props.chevron !== false ? h(Icon, { name: 'chevron', size: 16, strokeWidth: 2.2, className: 'pt-row-chev' }) : null
     );
   }
 
   function Button(props) {
     var v = props.variant || 'filled';
+    var cls = cx('pt-root', 'pt-btn', 'pt-btn-' + v, 'pt-app-' + (props.app || 'portail'),
+      props.size && props.size !== 'regular' && 'pt-btn-' + props.size, props.full && 'pt-btn-full', props.className);
+    var content = [
+      props.icon ? h(Icon, { key: 'i', name: props.icon, size: props.size === 'small' ? 15 : 20, strokeWidth: 2.2 }) : null,
+      props.children != null ? h('span', { key: 'l', className: 'pt-label' }, props.children) : null
+    ];
+    var aria = props.children == null ? props.label : undefined;
+    if (props.href) {
+      if (props.disabled) return h('span', { className: cls, role: 'link', 'aria-disabled': 'true', 'aria-label': aria }, content);
+      return h(linkTag(props), { href: props.href, className: cls, onClick: props.onClick, 'aria-label': aria }, content);
+    }
     return h('button', {
-      type: props.type || 'button',
-      className: cx('pt-root', 'pt-btn', 'pt-btn-' + v, 'pt-app-' + (props.app || 'portail'),
-        props.size && props.size !== 'regular' && 'pt-btn-' + props.size, props.full && 'pt-btn-full', props.className),
+      type: props.type || 'button', className: cls,
       onClick: props.disabled ? undefined : props.onClick,
-      'aria-disabled': props.disabled ? 'true' : undefined
-    }, props.icon ? h(Icon, { name: props.icon, size: props.size === 'small' ? 15 : 20, strokeWidth: 2.2 }) : null,
-      props.children != null ? h('span', { className: 'pt-label' }, props.children) : null);
+      'aria-disabled': props.disabled ? 'true' : undefined,
+      'aria-label': aria
+    }, content);
   }
 
   function TextField(props) {
@@ -310,7 +421,11 @@
     return h('div', { className: cx('pt-root', 'pt-field', 'pt-app-' + (props.app || 'portail'),
       search && 'pt-field-search', props.size === 'small' && 'pt-field-small', props.error && 'pt-field-error', props.className) },
       props.label ? h('label', { className: 'pt-field-label', htmlFor: id }, props.label) : null,
-      h('div', { className: 'pt-field-box' },
+      h('div', { className: 'pt-field-box', onPointerDown: function (e) {
+        /* un toucher à côté du champ (zone tactile agrandie, pictogramme, unité) le met au focus */
+        var input = e.currentTarget.querySelector('input');
+        if (input && e.target !== input) { e.preventDefault(); input.focus(); }
+      } },
         (props.icon || search) ? h(Icon, { name: props.icon || 'search', size: props.size === 'small' ? 14 : 18, strokeWidth: 2 }) : null,
         h('input', {
           id: id, type: props.type || (search ? 'search' : 'text'), placeholder: props.placeholder,
@@ -402,7 +517,7 @@
       if (selecting) { if (props.value === undefined) vs[1](it.id); if (props.onChange) props.onChange(it.id); }
       if (it.onSelect) it.onSelect();
       if (props.onSelect) props.onSelect(it.id);
-      close(true);
+      close(!it.href); /* un lien change de page : pas de retour du focus sur le bouton */
     }
 
     React.useEffect(function () {
@@ -450,8 +565,9 @@
       if (it.divider) return h('div', { key: 'd' + i, className: 'pt-menu-sep', role: 'separator' });
       if (it.section) return h('div', { key: 's' + i, className: 'pt-menu-section' }, it.section);
       var checked = selecting && it.id === value;
-      return h('button', {
-        key: it.id, type: 'button', tabIndex: -1,
+      var asLink = it.href && !it.disabled;
+      return h(asLink ? linkTag(props) : 'button', {
+        key: it.id, type: asLink ? undefined : 'button', href: asLink ? it.href : undefined, tabIndex: -1,
         role: selecting ? 'menuitemradio' : 'menuitem',
         'aria-checked': selecting ? String(checked) : undefined,
         'aria-disabled': it.disabled ? 'true' : undefined,
@@ -492,7 +608,7 @@
     }
     return h('div', {
       role: 'radiogroup', 'aria-label': props.label,
-      className: cx('pt-root', 'pt-seg', props.size === 'small' && 'pt-seg-small', props.full && 'pt-seg-full', 'pt-app-' + (props.app || 'portail'), props.className),
+      className: cx('pt-root', 'pt-seg', props.size === 'small' && 'pt-seg-small', props.size === 'auto' && 'pt-seg-auto', props.full && 'pt-seg-full', 'pt-app-' + (props.app || 'portail'), props.className),
       style: { '--n': items.length, '--i': idx }, onKeyDown: onKey
     },
       h('span', { className: 'pt-seg-thumb', 'aria-hidden': 'true' }),
@@ -647,9 +763,9 @@
       return function () { sp.removeEventListener('scroll', check); };
     }, []);
     var actions = (props.actions || []).map(function (a, i) {
-      return h(a.menu ? Menu : GlassButton, Object.assign({ key: i, size: mac ? 'small' : undefined, app: a.prominent ? props.app : undefined }, a.menu ? a.menu : a), a.children);
+      return h(a.menu ? Menu : GlassButton, Object.assign({ key: i, size: mac ? 'small' : undefined, app: a.prominent ? props.app : undefined, linkAs: props.linkAs }, a.menu ? a.menu : a), a.children);
     });
-    var back = props.back ? h(GlassButton, { icon: 'back', label: props.back.label || 'Retour', size: mac ? 'small' : undefined, onClick: props.back.onClick }) : null;
+    var back = props.back ? h(GlassButton, { icon: 'back', label: props.back.label || 'Retour', size: mac ? 'small' : undefined, onClick: props.back.onClick, href: props.back.href, linkAs: props.linkAs }) : null;
     if (mac) {
       return h('header', { ref: rootRef, className: cx('pt-root', 'pt-hdr', 'pt-hdr-mac', collapsed && 'is-collapsed', 'pt-app-' + (props.app || 'portail'), props.className) },
         h('div', { className: 'pt-hdr-bar' },
@@ -658,14 +774,14 @@
             h('h1', { className: 'pt-hdr-mac-title' }, props.title),
             props.subtitle ? h('p', { className: 'pt-hdr-mac-sub' }, props.subtitle) : null),
           props.center || null,
-          h('div', { className: 'pt-hdr-actions' }, actions)));
+          h('div', { className: 'pt-hdr-actions' }, props.trailing || null, actions)));
     }
     return h(React.Fragment, null,
       h('header', { ref: rootRef, className: cx('pt-root', 'pt-hdr', 'pt-hdr-ios', collapsed && 'is-collapsed', 'pt-app-' + (props.app || 'portail'), props.className) },
         h('div', { className: 'pt-hdr-bar' },
           h('div', { className: 'pt-hdr-side' }, back),
           h('div', { className: 'pt-hdr-small', 'aria-hidden': collapsed ? undefined : 'true' }, props.title),
-          h('div', { className: 'pt-hdr-side pt-hdr-actions' }, actions))),
+          h('div', { className: 'pt-hdr-side pt-hdr-actions' }, props.trailing || null, actions))),
       h('div', { ref: bigRef, className: cx('pt-root', 'pt-hdr-big', 'pt-app-' + (props.app || 'portail')) },
         props.eyebrow ? h('div', { className: 'pt-hdr-eyebrow' }, props.eyebrow) : null,
         h('h1', { className: 'pt-hdr-title' }, props.title),
@@ -722,7 +838,7 @@
     var foot = mac ? h('div', { className: 'pt-sheet-foot' },
       h(Button, { variant: 'gray', size: 'small', onClick: close }, props.cancelLabel || 'Annuler'),
       pa ? h(Button, { variant: 'filled', size: 'small', app: props.app, onClick: pa.onClick }, pa.label) : null) : null;
-    return h('div', { className: cx('pt-root', 'pt-sheet-layer', props.contained && 'is-contained', mac ? 'is-mac' : 'is-ios', 'pt-app-' + (props.app || 'portail')) },
+    var layer = h('div', { className: cx('pt-root', 'pt-sheet-layer', props.contained && 'is-contained', mac ? 'is-mac' : 'is-ios', 'pt-app-' + (props.app || 'portail')) },
       h('div', { className: 'pt-sheet-dim', onClick: props.dismissible === false ? undefined : close }),
       h('div', {
         ref: panelRef, role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': uid, tabIndex: -1,
@@ -732,6 +848,11 @@
         head,
         h('div', { className: 'pt-sheet-body' }, props.children),
         foot));
+    /* À la racine du document (portail React) : jamais coupée par un conteneur qui défile,
+       ni sous une barre collante. La classe pt-app-<app> est recopiée sur la couche. */
+    var RD = window.ReactDOM;
+    if (props.contained || !RD || !RD.createPortal || typeof document === 'undefined') return layer;
+    return RD.createPortal(layer, document.body);
   }
 
   /* ——— Graphique en courbe ——— */
@@ -794,6 +915,164 @@
     );
   }
 
+
+  /* ——— Select : liste déroulante (à la place du <select> natif) ——— */
+  var SELECT_DESKTOP = '(min-width: 768px)';
+  function Select(props) {
+    var options = props.options || [];
+    var vs = React.useState(props.defaultValue != null ? String(props.defaultValue) : '');
+    var current = props.value !== undefined ? (props.value == null ? '' : String(props.value)) : vs[0];
+    var selected = null;
+    options.forEach(function (o) { if (String(o.value) === current) selected = o; });
+    var os = React.useState(!!props.defaultOpen), open = os[0], setOpen = os[1];
+    var as = React.useState(function () {
+      var k = -1; options.forEach(function (o, i) { if (String(o.value) === current) k = i; }); return k;
+    }), activeI = as[0], setActive = as[1];
+    var ss = React.useState(function () { return isSmall(); }), small = ss[0], setSmall = ss[1];
+    var pls = React.useState({}), place = pls[0], setPlace = pls[1];
+    var btnRef = React.useRef(null), listRef = React.useRef(null), typed = React.useRef({ text: '', at: 0 });
+    var uid = 'ptsel' + React.useId().replace(/[^A-Za-z0-9]/g, '');
+    var cell = props.variant === 'cell';
+
+    function textOf(o) { return typeof o.label === 'string' || typeof o.label === 'number' ? String(o.label) : String(o.value); }
+    function enabledIndex(from, step) {
+      for (var i = from; i >= 0 && i < options.length; i += step) if (!options[i].disabled) return i;
+      return -1;
+    }
+    function isSmall() {
+      if (props.size === 'small') return true;
+      if (props.size === 'regular') return false;
+      return typeof window !== 'undefined' && window.matchMedia ? window.matchMedia(SELECT_DESKTOP).matches : false;
+    }
+    function show() {
+      if (props.disabled) return;
+      var i = -1;
+      options.forEach(function (o, k) { if (String(o.value) === current) i = k; });
+      setActive(i >= 0 ? i : enabledIndex(0, 1));
+      setSmall(isSmall());
+      setOpen(true);
+    }
+    function close(back) {
+      setOpen(false);
+      if (back !== false && btnRef.current) btnRef.current.focus({ preventScroll: true });
+    }
+    function choose(i) {
+      var o = options[i];
+      if (!o || o.disabled) return;
+      var v = String(o.value);
+      if (v !== current) {
+        if (props.value === undefined) vs[1](v);
+        if (props.onChange) props.onChange(v);
+      }
+      close();
+    }
+
+    /* Sous le champ, ou au-dessus s'il manque de place ; la liste suit le défilement */
+    React.useLayoutEffect(function () {
+      if (!open) return;
+      function placeList() {
+        var b = btnRef.current;
+        if (!b) return;
+        var r = b.getBoundingClientRect(), margin = 12;
+        var below = window.innerHeight - r.bottom - margin, above = r.top - margin;
+        var up = below < 220 && above > below;
+        var maxHeight = Math.max(160, Math.min(360, up ? above : below) - 6);
+        var width = Math.min(Math.max(r.width, small ? 200 : 240), window.innerWidth - 2 * margin);
+        var left = Math.min(Math.max(margin, r.left), window.innerWidth - width - margin);
+        var st = { position: 'fixed', left: left + 'px', right: 'auto', width: width + 'px', maxWidth: 'none', maxHeight: maxHeight + 'px', zIndex: 120,
+          transformOrigin: up ? 'bottom left' : 'top left' };
+        if (up) { st.top = 'auto'; st.bottom = (window.innerHeight - r.top + 6) + 'px'; }
+        else { st.top = (r.bottom + 6) + 'px'; st.bottom = 'auto'; }
+        setPlace(st);
+      }
+      placeList();
+      window.addEventListener('resize', placeList);
+      window.addEventListener('scroll', placeList, true);
+      return function () { window.removeEventListener('resize', placeList); window.removeEventListener('scroll', placeList, true); };
+    }, [open, small]);
+
+    /* Clic ou toucher en dehors : fermeture */
+    React.useEffect(function () {
+      if (!open) return;
+      function onDown(e) {
+        var t = e.target;
+        if ((listRef.current && listRef.current.contains(t)) || (btnRef.current && btnRef.current.contains(t))) return;
+        close(false);
+      }
+      document.addEventListener('pointerdown', onDown, true);
+      return function () { document.removeEventListener('pointerdown', onDown, true); };
+    }, [open]);
+
+    /* Choix actif visible */
+    React.useEffect(function () {
+      if (!open || !listRef.current) return;
+      var el = listRef.current.querySelector('[data-index="' + activeI + '"]');
+      if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
+    }, [open, activeI]);
+
+    function onKey(e) {
+      if (props.disabled) return;
+      function move(i) { e.preventDefault(); if (i >= 0) setActive(i); }
+      if (!open) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(); }
+        return;
+      }
+      if (e.key === 'ArrowDown') move(enabledIndex(activeI + 1, 1));
+      else if (e.key === 'ArrowUp') move(enabledIndex(activeI - 1, -1));
+      else if (e.key === 'Home') move(enabledIndex(0, 1));
+      else if (e.key === 'End') move(enabledIndex(options.length - 1, -1));
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(activeI); }
+      else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } /* ne ferme pas la Sheet autour */
+      else if (e.key === 'Tab') close(false);
+      else if (e.key.length === 1 && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        var now = Date.now();
+        typed.current = { text: (now - typed.current.at < 700 ? typed.current.text : '') + e.key.toLocaleLowerCase('fr-FR'), at: now };
+        var found = -1;
+        options.forEach(function (o, k) { if (found < 0 && !o.disabled && textOf(o).toLocaleLowerCase('fr-FR').indexOf(typed.current.text) === 0) found = k; });
+        if (found >= 0) setActive(found);
+      }
+    }
+
+    var appCls = 'pt-app-' + (props.app || 'portail');
+    var listEl = open ? h('div', {
+      ref: listRef, id: uid, role: 'listbox', 'aria-label': props['aria-label'] || props.label,
+      className: cx('pt-root', appCls, 'pt-menu', 'pt-glass-thick', 'pt-select-list', small && 'pt-menu-small'),
+      style: place
+    }, options.map(function (o, i) {
+      var checked = String(o.value) === current;
+      return h('div', {
+        key: String(o.value) + '-' + i, id: uid + '-' + i, 'data-index': i, role: 'option',
+        'aria-selected': checked ? 'true' : 'false', 'aria-disabled': o.disabled ? 'true' : undefined,
+        className: cx('pt-menu-item', i === activeI && 'is-active'),
+        onPointerEnter: function () { if (!o.disabled) setActive(i); },
+        onPointerDown: function (e) { e.preventDefault(); }, /* le focus reste sur le champ */
+        onClick: function () { choose(i); }
+      },
+        h('span', { className: 'pt-menu-check', 'aria-hidden': 'true' }, checked ? h(Icon, { name: 'check', size: small ? 13 : 16, strokeWidth: 2.6 }) : null),
+        h('span', { className: 'pt-menu-text' }, h('span', { className: 'pt-select-optlabel' }, o.label)));
+    })) : null;
+    var RD = window.ReactDOM;
+    var portal = listEl && RD && RD.createPortal && typeof document !== 'undefined' ? RD.createPortal(listEl, document.body) : listEl;
+
+    return h(React.Fragment, null,
+      h('button', {
+        ref: btnRef, id: props.id, type: 'button', role: 'combobox',
+        'aria-haspopup': 'listbox', 'aria-expanded': open ? 'true' : 'false',
+        'aria-controls': open ? uid : undefined,
+        'aria-activedescendant': open && activeI >= 0 ? uid + '-' + activeI : undefined,
+        'aria-label': props['aria-label'], 'aria-invalid': props['aria-invalid'] ? 'true' : undefined,
+        'aria-required': props.required ? 'true' : undefined,
+        disabled: props.disabled,
+        className: cx('pt-root', 'pt-select', appCls, cell && 'pt-select-cell', props.size === 'small' && 'pt-select-small', props.size === 'regular' && 'pt-select-regular', open && 'is-open', props.className),
+        onClick: function () { if (open) close(); else show(); },
+        onKeyDown: onKey
+      },
+        h('span', { className: cx('pt-select-value', !selected && 'is-placeholder') }, selected ? selected.label : (props.placeholder || 'Choisir…')),
+        h(Icon, { name: 'updown', size: 14, strokeWidth: 2.4, className: 'pt-select-caret' })),
+      props.name ? h('input', { type: 'hidden', name: props.name, value: current }) : null,
+      portal);
+  }
+
   window.Portail = window.Portail || {};
   Object.assign(window.Portail, {
     AppIcon: AppIcon, AppTile: AppTile, GlassButton: GlassButton,
@@ -801,6 +1080,7 @@
     Card: Card, List: List, ListRow: ListRow, Button: Button, TextField: TextField,
     ProgressRing: ProgressRing, BarChart: BarChart, Menu: Menu,
     SegmentedControl: SegmentedControl, Toggle: Toggle, DatePicker: DatePicker, Calendar: Calendar,
-    AppHeader: AppHeader, Sheet: Sheet, LineChart: LineChart
+    AppHeader: AppHeader, Sheet: Sheet, LineChart: LineChart,
+    Select: Select, setLinkComponent: setLinkComponent
   });
 })();
