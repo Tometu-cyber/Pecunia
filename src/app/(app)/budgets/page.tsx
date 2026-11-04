@@ -78,16 +78,10 @@ export default async function BudgetsPage({ searchParams }: { searchParams: Prom
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
                           <p className="truncate text-body">{l.category.name}</p>
-                          {/* budget à 0 € : ratio infini, « Dépassé » seul ; vrai budget dépassé : « Dépassé · 462 % » */}
-                          <p className={`shrink-0 text-body font-semibold tabular-nums ${Number.isFinite(l.ratio) ? statusText[l.status] : "text-danger-text"}`}>
-                            {Number.isFinite(l.ratio) ? (
-                              <>
-                                {l.remainingCents < 0 && "Dépassé · "}
-                                {formatPercent(Math.min(l.ratio, 9.99), 0)}
-                              </>
-                            ) : (
-                              "Dépassé"
-                            )}
+                          {/* budget à 0 € : ratio infini, « Dépassé » seul ; vrai budget dépassé : « Dépassé 462 % ». « Dépassé » reste en petit */}
+                          <p className={`flex shrink-0 items-baseline gap-1.5 tabular-nums ${Number.isFinite(l.ratio) ? statusText[l.status] : "text-danger-text"}`}>
+                            {(!Number.isFinite(l.ratio) || l.remainingCents < 0) && <span className="text-foot font-medium">Dépassé</span>}
+                            {Number.isFinite(l.ratio) && <span className="text-body font-semibold">{formatPercent(Math.min(l.ratio, 9.99), 0)}</span>}
                           </p>
                         </div>
                         <p className="text-sub text-label-secondary">

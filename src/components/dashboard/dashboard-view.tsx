@@ -248,16 +248,10 @@ function AlertsCard({ alerts }: { alerts: BudgetLine[] }) {
                 <i className="size-2.5 shrink-0 rounded-full" style={{ background: l.category.color }} aria-hidden />
                 <span className="truncate">{l.category.name}</span>
               </span>
-              {/* budget à 0 € : ratio infini, « Dépassé » seul ; vrai budget dépassé : « Dépassé · 462 % » */}
-              <span className={`shrink-0 font-semibold tabular-nums ${l.status === "over" ? "text-danger-text" : "text-label"}`}>
-                {Number.isFinite(l.ratio) ? (
-                  <>
-                    {l.remainingCents < 0 && "Dépassé · "}
-                    {formatPercent(l.ratio, 0)}
-                  </>
-                ) : (
-                  "Dépassé"
-                )}
+              {/* budget à 0 € : « Dépassé » seul ; vrai budget dépassé : « Dépassé 462 % ». « Dépassé » reste en petit (13 px) */}
+              <span className={`flex shrink-0 items-baseline gap-1.5 tabular-nums ${l.status === "over" || !Number.isFinite(l.ratio) ? "text-danger-text" : "text-label"}`}>
+                {(!Number.isFinite(l.ratio) || l.remainingCents < 0) && <span className="text-[13px] leading-[18px] font-medium">Dépassé</span>}
+                {Number.isFinite(l.ratio) && <span className="font-semibold">{formatPercent(l.ratio, 0)}</span>}
               </span>
             </div>
             <Gauge ratio={l.ratio} status={l.status} label={`Budget ${l.category.name} utilisé`} className="mt-2" />
