@@ -20,15 +20,14 @@ export async function getBudgetOverview(month: MonthKey, monthTxs?: Transaction[
     getAccounts(),
   ]);
   const period = monthPeriod(month, profile.monthStartDay);
-  const txs = monthTxs ?? (await getTransactions({ from: period.start, to: period.end }));
+  const prev = monthPeriod(addMonths(month, -1), profile.monthStartDay);
+  // mois affiché et, si le report est actif, mois précédent : lus en parallèle
+  const [txs, prevTxs] = await Promise.all([
+    monthTxs ?? getTransactions({ from: period.start, to: period.end }),
+    profile.budgetCarryOver ? getTransactions({ from: prev.start, to: prev.end }) : null,
+  ]);
   const base = { budgets, categories, accounts, referenceIncomeCents: profile.referenceIncomeCents };
-
-  let carryOverCents = 0;
-  if (profile.budgetCarryOver) {
-    const prev = monthPeriod(addMonths(month, -1), profile.monthStartDay);
-    const prevTxs = await getTransactions({ from: prev.start, to: prev.end });
-    carryOverCents = carryOverFrom(computeBudgets({ ...base, txs: prevTxs }));
-  }
+  const carryOverCents = prevTxs ? carryOverFrom(computeBudgets({ ...base, txs: prevTxs })) : 0;
   return computeBudgets({ ...base, txs, carryOverCents });
 }
 

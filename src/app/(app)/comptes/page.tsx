@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAppData, getGoals, getTransactions } from "@/lib/data/queries";
+import { getAppData, getGoals, getProfile, getTransactions } from "@/lib/data/queries";
 import { resolveMonth } from "@/lib/data/views";
 import { addMonths, lastMonths, monthAbbr, monthPeriod, todayIso } from "@/lib/domain/dates";
 import { goalStatus } from "@/lib/domain/goals";
@@ -16,13 +16,17 @@ import { GoalsSection } from "@/components/accounts/goals-section";
 export const metadata = { title: "Comptes" };
 
 export default async function AccountsPage() {
-  const [{ profile, accounts, balances, recurrences }, goals] = await Promise.all([getAppData(), getGoals()]);
+  const profile = await getProfile();
   const startDay = profile.monthStartDay;
   const { current } = resolveMonth(undefined, startDay);
   const months = lastMonths(current, 12);
   const ends = months.map((m) => monthPeriod(m, startDay).end);
   const yearAgoEnd = monthPeriod(addMonths(current, -12), startDay).end;
-  const txs = await getTransactions({ from: monthPeriod(months[0]!, startDay).start });
+  const [{ accounts, balances, recurrences }, goals, txs] = await Promise.all([
+    getAppData(),
+    getGoals(),
+    getTransactions({ from: monthPeriod(months[0]!, startDay).start }),
+  ]);
 
   const active = accounts.filter((a) => !a.archivedAt);
   const archived = accounts.filter((a) => a.archivedAt);

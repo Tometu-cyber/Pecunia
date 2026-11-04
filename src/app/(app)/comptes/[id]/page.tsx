@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAppData, getGoals, getTransactions } from "@/lib/data/queries";
+import { getAppData, getGoals, getProfile, getTransactions } from "@/lib/data/queries";
 import { goalStatus } from "@/lib/domain/goals";
 import { todayIso } from "@/lib/domain/dates";
 import { resolveMonth } from "@/lib/data/views";
@@ -17,15 +17,18 @@ import { AccountTransactions } from "./account-transactions";
 
 export default async function AccountDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [{ profile, accounts, balances, recurrences }, goals] = await Promise.all([getAppData(), getGoals()]);
-  const account = accounts.find((a) => a.id === id);
-  if (!account) notFound();
-
+  const profile = await getProfile();
   const startDay = profile.monthStartDay;
   const { current } = resolveMonth(undefined, startDay);
   const months = lastMonths(current, 12);
   const period = monthPeriod(current, startDay);
-  const txs = await getTransactions({ accountId: id, from: monthPeriod(months[0]!, startDay).start });
+  const [{ accounts, balances, recurrences }, goals, txs] = await Promise.all([
+    getAppData(),
+    getGoals(),
+    getTransactions({ accountId: id, from: monthPeriod(months[0]!, startDay).start }),
+  ]);
+  const account = accounts.find((a) => a.id === id);
+  if (!account) notFound();
   const balance = balances.get(id)?.balanceCents ?? account.initialBalanceCents;
   const series = balanceSeriesFromCurrent(id, balance, txs, months.map((m) => monthPeriod(m, startDay).end));
   const monthTxs = txs.filter((t) => isInPeriod(t.date, period));

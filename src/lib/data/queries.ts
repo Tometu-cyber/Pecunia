@@ -13,12 +13,28 @@ import { toAccount, toBudget, toCategory, toForecastDecision, toForecastItem, to
 
 const PAGE = 1000; // limite par défaut de PostgREST
 
+export interface SessionUser {
+  id: string;
+  email?: string;
+  user_metadata?: Record<string, unknown>;
+}
+
+/**
+ * Utilisateur connecté, lu dans le jeton de session. getClaims vérifie la signature du
+ * jeton sur place (clés asymétriques) au lieu d'interroger le serveur d'authentification
+ * comme getUser : un aller-retour réseau de moins à chaque page. Avec une clé symétrique
+ * (ancien réglage des projets Supabase), il retombe de lui-même sur getUser.
+ */
 export const getSession = cache(async () => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+  if (!claims?.sub) redirect("/login");
+  const user: SessionUser = {
+    id: claims.sub,
+    email: typeof claims.email === "string" ? claims.email : undefined,
+    user_metadata: (claims.user_metadata as Record<string, unknown> | undefined) ?? undefined,
+  };
   return { supabase, user };
 });
 
@@ -27,7 +43,7 @@ async function initializeUser(): Promise<void> {
   const { supabase, user } = await getSession();
   const { error } = await supabase
     .from("profiles")
-    .insert({ id: user.id, email: user.email ?? "", display_name: user.user_metadata?.display_name ?? null });
+    .insert({ id: user.id, email: user.email ?? "", display_name: (user.user_metadata?.display_name as string | undefined) ?? null });
   if (error) {
     // Course entre deux requêtes parallèles : le profil existe déjà, rien à faire.
     if (error.code === "23505") return;
@@ -53,29 +69,45 @@ async function initializeUser(): Promise<void> {
   });
 }
 
-export const getProfile = cache(async (): Promise<Profile> => {
+/** Profil, et s'il vient d'être créé (1re connexion : comptes et catégories aussi). */
+const loadProfile = cache(async (): Promise<{ profile: Profile; created: boolean }> => {
   const { supabase, user } = await getSession();
   const { data, error } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
   if (error) throw error;
-  if (data) return toProfile(data);
+  if (data) return { profile: toProfile(data), created: false };
   await initializeUser();
   const { data: created, error: err2 } = await supabase.from("profiles").select("*").eq("id", user.id).single();
   if (err2) throw err2;
-  return toProfile(created);
+  return { profile: toProfile(created), created: true };
 });
+
+export const getProfile = cache(async (): Promise<Profile> => (await loadProfile()).profile);
+
+/**
+ * Lit une table créée à l'initialisation du compte en même temps que le profil, au lieu
+ * d'attendre le profil : si le profil vient d'être créé, la lecture est refaite.
+ */
+async function withProfileReady<T>(read: () => Promise<T>): Promise<T> {
+  const [rows, { created }] = await Promise.all([read(), loadProfile()]);
+  return created ? read() : rows;
+}
 
 export const getAccounts = cache(async (): Promise<Account[]> => {
   const { supabase } = await getSession();
-  const { data, error } = await supabase.from("accounts").select("*").order("sort_order").order("created_at");
-  if (error) throw error;
-  return data.map(toAccount);
+  return withProfileReady(async () => {
+    const { data, error } = await supabase.from("accounts").select("*").order("sort_order").order("created_at");
+    if (error) throw error;
+    return data.map(toAccount);
+  });
 });
 
 export const getCategories = cache(async (): Promise<Category[]> => {
   const { supabase } = await getSession();
-  const { data, error } = await supabase.from("categories").select("*").order("sort_order").order("created_at");
-  if (error) throw error;
-  return data.map(toCategory);
+  return withProfileReady(async () => {
+    const { data, error } = await supabase.from("categories").select("*").order("sort_order").order("created_at");
+    if (error) throw error;
+    return data.map(toCategory);
+  });
 });
 
 export const getBudgets = cache(async (): Promise<Budget[]> => {
@@ -173,9 +205,9 @@ export const getGoals = cache(async (): Promise<Goal[]> => {
 
 /** Données communes à toutes les pages de l'application (layout). */
 export const getAppData = cache(async () => {
-  // Le profil d'abord : sa création initialise aussi comptes et catégories.
-  const profile = await getProfile();
-  const [accounts, categories, balances, placeMemory, recurrences, forecastItems] = await Promise.all([
+  // Tout en parallèle : comptes et catégories attendent d'eux-mêmes une éventuelle 1re initialisation.
+  const [profile, accounts, categories, balances, placeMemory, recurrences, forecastItems] = await Promise.all([
+    getProfile(),
     getAccounts(),
     getCategories(),
     getBalances(),

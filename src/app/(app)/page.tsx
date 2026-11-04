@@ -1,4 +1,4 @@
-import { getAppData, getForecastDecisions, getTransactions } from "@/lib/data/queries";
+import { getAppData, getForecastDecisions, getProfile, getTransactions } from "@/lib/data/queries";
 import { getBudgetOverview, resolveMonth, withParams } from "@/lib/data/views";
 import { addMonths, isInPeriod, lastMonths, monthAbbr, monthKeyOf, monthLabel, monthPeriod, todayIso } from "@/lib/domain/dates";
 import { recurrenceKey } from "@/lib/domain/forecast";
@@ -18,17 +18,22 @@ export const metadata = { title: "Tableau de bord" };
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
-  const { profile, accounts, categories, balances, recurrences, forecastItems } = await getAppData();
+  // Le profil seul d'abord (jour de début de mois), puis tout le reste en parallèle
+  const profile = await getProfile();
   const startDay = profile.monthStartDay;
   const { month, current } = resolveMonth(params.mois, startDay);
-  const activeAccounts = accounts.filter((a) => !a.archivedAt);
-  const accountId = activeAccounts.some((a) => a.id === params.compte) ? params.compte! : null;
-
   const months = lastMonths(month, 12);
   const period = monthPeriod(month, startDay);
   const windowStart = monthPeriod(months[0]!, startDay).start;
-  // Depuis le début de la fenêtre de 12 mois jusqu'à aujourd'hui (sparklines reconstruites à rebours)
-  const txs = await getTransactions({ from: windowStart });
+  const today = todayIso();
+  const [{ accounts, categories, balances, recurrences, forecastItems }, txs, decisions] = await Promise.all([
+    getAppData(),
+    // Depuis le début de la fenêtre de 12 mois jusqu'à aujourd'hui (sparklines reconstruites à rebours)
+    getTransactions({ from: windowStart }),
+    getForecastDecisions(monthKeyOf(today, startDay)),
+  ]);
+  const activeAccounts = accounts.filter((a) => !a.archivedAt);
+  const accountId = activeAccounts.some((a) => a.id === params.compte) ? params.compte! : null;
   const monthTxs = txs.filter((t) => isInPeriod(t.date, period));
   const scoped = filterByAccount(monthTxs, accountId);
 
@@ -55,11 +60,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const inBudgetNames = activeAccounts.filter((a) => a.inBudget).map((a) => a.name);
 
   // À venir : 5 prochaines échéances (récurrences non réalisées + dépenses prévues)
-  const today = todayIso();
   const horizonEnd = new Date(Date.parse(`${today}T00:00:00Z`) + 60 * 86_400_000).toISOString().slice(0, 10);
   const accountById = new Map(accounts.map((a) => [a.id, a]));
   // décisions du prévisionnel : échéances refusées masquées, montants et dates modifiés repris
-  const decisionByKey = new Map((await getForecastDecisions(monthKeyOf(today, startDay))).map((d) => [d.sourceKey, d]));
+  const decisionByKey = new Map(decisions.map((d) => [d.sourceKey, d]));
   const upcoming = [
     ...buildOccurrences(recurrences, txs, today, horizonEnd)
       .filter((o) => o.status === "planned" && decisionByKey.get(recurrenceKey(o.recurrence.id, o.date))?.status !== "rejected")

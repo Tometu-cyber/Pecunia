@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { clsx } from "clsx";
 import { TriangleAlert } from "lucide-react";
-import { getAppData, getForecastDecisions, getTransactions } from "@/lib/data/queries";
+import { getAppData, getForecastDecisions, getProfile, getTransactions } from "@/lib/data/queries";
 import { getBudgetOverview, withParams } from "@/lib/data/views";
 import { addMonths, monthAbbr, monthKeyOf, monthName, monthPeriod, todayIso } from "@/lib/domain/dates";
 import { buildForecast, plannedEffects, proposalEffects } from "@/lib/domain/forecast";
@@ -19,22 +19,23 @@ const HORIZONS = [1, 3, 6, 12] as const;
 
 export default async function ForecastPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
-  const { profile, accounts, balances, recurrences, forecastItems } = await getAppData();
+  const profile = await getProfile();
   const today = todayIso();
   const startDay = profile.monthStartDay;
   const horizon = HORIZONS.find((h) => String(h) === params.horizon) ?? 3;
-  const active = accounts.filter((a) => !a.archivedAt);
-  const accountId = active.some((a) => a.id === params.compte) ? params.compte! : null;
 
   const current = monthKeyOf(today, startDay);
   const from = monthPeriod(current, startDay).start;
   const to = monthPeriod(addMonths(current, horizon - 1), startDay).end;
   const range = occurrenceWindow(from, to);
-  const [txs, budgets, decisions] = await Promise.all([
+  const [{ accounts, balances, recurrences, forecastItems }, txs, budgets, decisions] = await Promise.all([
+    getAppData(),
     getTransactions({ from: range.from, to: range.to }),
     getBudgetOverview(current),
     getForecastDecisions(current),
   ]);
+  const active = accounts.filter((a) => !a.archivedAt);
+  const accountId = active.some((a) => a.id === params.compte) ? params.compte! : null;
   const currentBalances = Object.fromEntries(active.map((a) => [a.id, balances.get(a.id)?.balanceCents ?? a.initialBalanceCents]));
   const { months, alerts } = buildForecast({
     accounts,

@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { getAppData, getTransactions } from "@/lib/data/queries";
+import { getAppData, getProfile, getTransactions } from "@/lib/data/queries";
 import { resolveMonth } from "@/lib/data/views";
 import { addMonths, isInPeriod, lastMonths, monthAbbr, monthName, monthPeriod } from "@/lib/domain/dates";
 import { categorySeries, compareMonths, savingsByAccount } from "@/lib/domain/analyses";
@@ -14,11 +14,14 @@ export const metadata = { title: "Analyses" };
 
 export default async function AnalysesPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
-  const { profile, accounts, categories, balances } = await getAppData();
+  const profile = await getProfile();
   const startDay = profile.monthStartDay;
   const { month, current } = resolveMonth(params.mois, startDay);
   const months = lastMonths(month, 12);
-  const txs = await getTransactions({ from: monthPeriod(months[0]!, startDay).start });
+  const [{ accounts, categories, balances }, txs] = await Promise.all([
+    getAppData(),
+    getTransactions({ from: monthPeriod(months[0]!, startDay).start }),
+  ]);
 
   const period = monthPeriod(month, startDay);
   const prevPeriod = monthPeriod(addMonths(month, -1), startDay);
