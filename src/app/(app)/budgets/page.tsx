@@ -78,7 +78,7 @@ export default async function BudgetsPage({ searchParams }: { searchParams: Prom
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
                           <p className="truncate text-body">{l.category.name}</p>
-                          <p className={`text-body font-semibold tabular-nums ${statusText[l.status]}`}>{formatPercent(Math.min(l.ratio, 9.99), 0)}</p>
+                          <p className={`text-body font-semibold tabular-nums ${statusText[l.status]}`}>{Number.isFinite(l.ratio) ? formatPercent(Math.min(l.ratio, 9.99), 0) : "Dépassé"}</p>
                         </div>
                         <p className="text-sub text-label-secondary">
                           {accountNames.join(" + ")}
