@@ -23,3 +23,5 @@ Le sélecteur de date compact d'iOS : un bouton gris qui affiche la date (« 6 n
 **Règles :**
 - Formulaire d'ajout : date du jour par défaut, pour n'avoir rien à toucher dans le cas courant.
 - Le calendrier `inline` est réservé aux écrans dont la date est le sujet (Agenda, planning des séances).
+
+**Alignement :** le bouton de date ne déborde pas de son conteneur (`min-width: 0`). La date est alignée à gauche et coupée avec « … » si la place manque. Sur mobile, sa zone tactile fait 44 × 44 px, comme les flèches de mois du calendrier.

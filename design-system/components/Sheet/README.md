@@ -29,3 +29,5 @@ La feuille modale, pour une tâche courte qui ne mérite pas un écran entier : 
 - Une feuille = une tâche. Jamais de feuille ouverte depuis une autre feuille.
 - Le champ principal en premier et en grand (le montant, la durée).
 - Valeurs par défaut pour le cas courant (date du jour, dernière catégorie utilisée), pour pouvoir valider en deux gestes.
+
+**Rendue à la racine du document :** sauf avec `contained`, la feuille est rendue dans `document.body` (portail React), avec la classe `pt-app-<app>` recopiée sur la couche. Ouverte depuis un en-tête collant ou une carte qui défile, elle n'est jamais coupée et ne passe jamais sous une barre flottante.

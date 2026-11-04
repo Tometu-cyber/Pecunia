@@ -16,3 +16,5 @@ La tuile d'une app sur l'accueil du portail : icône, nom, un chiffre clé et un
 - Une ou deux tuiles `tinted` maximum par écran, pour l'app qui demande ton attention (échéance proche, objectif atteint). Les autres restent `plain`.
 - Jamais de verre sur une tuile : c'est du contenu.
 - Le chiffre doit être lisible en un coup d'œil. S'il faut une phrase, c'est le `detail`.
+
+**Jauges d'état :** la jauge (`pt-tile-bar`) accepte deux variantes, `is-warn` (couleur `warning`) et `is-over` (couleur `danger`), pour un objectif bientôt atteint ou dépassé, un quota… Les ajouter sur l'élément `.pt-tile-bar`. Toujours doubler la couleur d'un texte (« 92 % », « 2 séances de plus que prévu »).

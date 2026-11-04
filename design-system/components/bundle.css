@@ -539,3 +539,159 @@ button.pt-row:focus-visible { outline: 2px solid var(--tint); outline-offset: -2
 .pt-line-x span { position: absolute; transform: translateX(-50%); font-size: 12px; line-height: 16px; color: var(--label-secondary); white-space: nowrap; }
 .pt-line-x span.is-first { transform: none; }
 .pt-line-x span.is-last { transform: translateX(-100%); }
+
+/* ——— Ajouts remontés de Pecunia ——— */
+
+/* Liens : les composants avec `href` se rendent en <a>, avec les mêmes styles qu'en <button> */
+a.pt-gbtn, a.pt-btn, a.pt-tab, a.pt-side-item, a.pt-row, a.pt-menu-item { text-decoration: none; }
+a.pt-gbtn { color: var(--label); }
+a.pt-gbtn.pt-gbtn-prominent { color: var(--on-app); }
+a.pt-btn { color: inherit; }
+a.pt-btn-filled { color: var(--on-app); }
+a.pt-btn-tinted, a.pt-btn-plain { color: var(--app-text); }
+a.pt-btn-gray { color: var(--label); }
+a.pt-tab { color: var(--label); }
+a.pt-side-item, a.pt-row { color: var(--label); }
+a.pt-menu-item { color: var(--label); }
+a.pt-menu-item.is-danger { color: var(--danger-text); }
+button.pt-row:focus-visible, a.pt-row:focus-visible { outline-color: var(--app, var(--tint)); }
+a.pt-row { cursor: pointer; }
+a.pt-row:hover { background: var(--fill-tertiary); }
+a.pt-row:active { background: var(--fill-secondary); }
+a.pt-row:focus-visible { outline: 2px solid var(--app, var(--tint)); outline-offset: -2px; }
+.pt-btn[aria-disabled="true"]:active, .pt-gbtn[aria-disabled="true"]:active { transform: none; }
+.pt-gbtn[aria-disabled="true"] { opacity: 0.4; cursor: default; }
+
+/* Contraste dans une app à couleur claire (vert, jaune, orange…) : l'onglet actif et les
+   pictogrammes de la barre latérale sont du texte ou un trait fin posés sur du verre clair.
+   La couleur pleine <app> y tombe vers 2:1 ; <app>-text garde 4,5:1. Le portail (bleu) ne change pas. */
+.pt-tabbar-row[class*="pt-app-"]:not(.pt-app-portail) .pt-tab[aria-current="page"] { color: var(--app-text); }
+.pt-sidebar[class*="pt-app-"]:not(.pt-app-portail) .pt-side-item > .pt-icon { color: var(--app-text); }
+/* En clair, la pastille grise de l'onglet actif est éclaircie (gray-5 à 50 %) : le libellé en
+   <app>-text y garde 4,5:1 (4,3:1 sur fill-secondary). En sombre, la pastille habituelle passe déjà. */
+.pt-tabbar-row[class*="pt-app-"]:not(.pt-app-portail) .pt-tab[aria-current="page"],
+.pt-tabbar-row[class*="pt-app-"]:not(.pt-app-portail) .pt-tab-pill,
+.pt-tabbar-row[class*="pt-app-"]:not(.pt-app-portail) .pt-tabbar.is-dragging .pt-tab-pill { background: color-mix(in srgb, var(--gray-5) 50%, transparent); }
+.pt-tabbar-row[class*="pt-app-"]:not(.pt-app-portail) .pt-tabbar.has-pill .pt-tab[aria-current="page"] { background: transparent; }
+[data-theme="dark"] .pt-tabbar-row[class*="pt-app-"]:not(.pt-app-portail) .pt-tab[aria-current="page"],
+[data-theme="dark"] .pt-tabbar-row[class*="pt-app-"]:not(.pt-app-portail) .pt-tab-pill { background: var(--fill-secondary); }
+[data-theme="dark"] .pt-tabbar-row[class*="pt-app-"]:not(.pt-app-portail) .pt-tabbar.is-dragging .pt-tab-pill { background: var(--fill-primary); }
+[data-theme="dark"] .pt-tabbar-row[class*="pt-app-"]:not(.pt-app-portail) .pt-tabbar.has-pill .pt-tab[aria-current="page"] { background: transparent; }
+
+/* Cible tactile de 44 px sur mobile : les contrôles compacts (28 à 36 px de haut) gardent leur
+   taille visible, mais la zone qui réagit au doigt fait au moins hit-target × hit-target. */
+@media (max-width: 767px) {
+  .pt-btn-small, .pt-gbtn-small, .pt-seg-item, .pt-date-btn, .pt-cal-nav,
+  .pt-switch, .pt-select-cell, .pt-field-small .pt-field-box { position: relative; }
+  .pt-btn-small::after, .pt-gbtn-small::after, .pt-seg-item::after, .pt-date-btn::after, .pt-cal-nav::after,
+  .pt-switch::after, .pt-select-cell::after, .pt-field-small .pt-field-box::after {
+    content: ""; position: absolute; left: 50%; top: 50%;
+    width: max(100%, var(--hit-target)); height: max(100%, var(--hit-target));
+    transform: translate(-50%, -50%);
+  }
+  /* le champ reste au-dessus de sa zone agrandie : le curseur se place toujours au doigt */
+  .pt-field-small .pt-field-box > input { position: relative; z-index: 1; }
+  /* menu compact (ordi) affiché sur un téléphone : lignes de 44 px, trop serrées sinon */
+  .pt-menu-small .pt-menu-item { min-height: var(--hit-target); }
+}
+
+/* TabBar glissable (option draggable, façon iOS 26) : une pastille sous l'onglet actif,
+   qui suit le doigt pendant un glissé et grossit comme une loupe. */
+.pt-tabbar.has-pill { position: relative; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.pt-tabbar.has-pill .pt-tab { position: relative; z-index: 1; -webkit-user-drag: none; }
+.pt-tabbar.has-pill .pt-tab[aria-current="page"] { background: transparent; }
+.pt-tab-pill {
+  position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 0;
+  border-radius: var(--radius-full); background: var(--fill-secondary); pointer-events: none;
+  transition: translate 340ms cubic-bezier(.3, 1.25, .5, 1), width 340ms cubic-bezier(.3, 1.25, .5, 1), scale 200ms ease, background-color 200ms ease;
+}
+.pt-tabbar.is-dragging .pt-tab-pill { transition: scale 200ms ease, background-color 200ms ease; scale: 1.1; background: var(--fill-primary); }
+.pt-tabbar.is-dragging .pt-tab[aria-current="page"]:not(.is-over) { color: var(--label); }
+.pt-tabbar.is-dragging .pt-tab.is-over { color: var(--app-text); }
+@media (prefers-reduced-motion: reduce) {
+  .pt-tab-pill, .pt-tabbar.is-dragging .pt-tab-pill { transition: none; scale: 1; }
+}
+
+/* SegmentedControl size "auto" : regular (36 px) sur mobile, small (28 px) sur ordi */
+@media (min-width: 768px) {
+  .pt-seg-auto { height: var(--control-mac); padding: 2px; }
+  .pt-seg-auto .pt-seg-thumb { top: 2px; bottom: 2px; left: 2px; width: calc((100% - 4px) / var(--n)); }
+  .pt-seg-auto .pt-seg-item { min-width: 48px; padding: 0 var(--space-2); font-size: 13px; line-height: 16px; letter-spacing: -0.08px; }
+}
+
+/* Select : déclencheur à l'apparence d'un TextField, liste dans le menu en verre épais */
+.pt-select {
+  display: flex; align-items: center; gap: var(--space-2); width: 100%; min-width: 0;
+  min-height: var(--hit-target); padding: 0 var(--space-3);
+  border: 1px solid transparent; border-radius: 12px; background: var(--fill-tertiary);
+  color: var(--label); text-align: left; cursor: pointer;
+  font: 400 17px/22px var(--font-sans); letter-spacing: -0.43px;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+.pt-select:focus-visible, .pt-select.is-open { outline: none; border-color: var(--app); background: var(--bg-tertiary); box-shadow: 0 0 0 4px var(--app-bg); }
+.pt-select:disabled { opacity: 0.5; cursor: not-allowed; }
+.pt-select[aria-invalid="true"] { border-color: var(--danger); }
+.pt-select-value { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-select-value.is-placeholder { color: var(--label-tertiary); }
+.pt-select-caret { flex: none; color: var(--label-secondary); }
+.pt-select-small, .pt-select-cell {
+  min-height: var(--control-mac); padding: 0 var(--space-2); border-radius: var(--radius-xs);
+  font-size: 13px; line-height: 16px; letter-spacing: -0.08px;
+}
+.pt-select-small .pt-select-caret, .pt-select-cell .pt-select-caret { width: 12px; height: 12px; }
+@media (min-width: 768px) {
+  .pt-select:not(.pt-select-regular) {
+    min-height: var(--control-mac); padding: 0 var(--space-2); border-radius: var(--radius-xs);
+    font-size: 13px; line-height: 16px; letter-spacing: -0.08px;
+  }
+  .pt-select:not(.pt-select-regular) .pt-select-caret { width: 12px; height: 12px; }
+}
+.pt-select-cell { background: transparent; }
+.pt-select-cell:hover { background: var(--fill-tertiary); }
+.pt-select-cell:focus-visible, .pt-select-cell.is-open { box-shadow: 0 0 0 3px var(--app-bg); }
+.pt-select-list { overflow-y: auto; overscroll-behavior: contain; }
+.pt-select-list .pt-menu-item { flex-shrink: 0; }
+.pt-select-optlabel { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Choix actif au clavier ; le survol suit le choix actif (jamais deux lignes surlignées) */
+.pt-menu-item.is-active { background: var(--fill-secondary); }
+[role="listbox"] .pt-menu-item:hover:not(.is-active) { background: transparent; }
+.pt-menu-small .pt-menu-item.is-active { background: var(--tint); color: #ffffff; }
+.pt-menu-small .pt-menu-item.is-active .pt-menu-check { color: #ffffff; }
+[role="listbox"].pt-menu-small .pt-menu-item:hover:not(.is-active) { background: transparent; color: var(--label); }
+[role="listbox"].pt-menu-small .pt-menu-item:hover:not(.is-active) .pt-menu-check { color: var(--label); }
+
+/* Champ date sur iPhone : sans l'apparence native, Safari colle la valeur en haut et la centre.
+   Valeur à gauche, centrée verticalement, et le champ ne déborde plus de son conteneur. */
+.pt-field-box input[type="date"], .pt-field-box input[type="time"],
+.pt-field-box input[type="datetime-local"], .pt-field-box input[type="month"] {
+  -webkit-appearance: none; appearance: none; min-width: 0; max-width: 100%;
+  height: auto; align-self: center; padding: 10px 0; line-height: 22px;
+}
+.pt-field-small .pt-field-box input[type="date"], .pt-field-small .pt-field-box input[type="time"],
+.pt-field-small .pt-field-box input[type="datetime-local"], .pt-field-small .pt-field-box input[type="month"] { padding: 5px 0; line-height: 16px; }
+.pt-field-box input[type="date"]::-webkit-date-and-time-value, .pt-field-box input[type="time"]::-webkit-date-and-time-value,
+.pt-field-box input[type="datetime-local"]::-webkit-date-and-time-value, .pt-field-box input[type="month"]::-webkit-date-and-time-value {
+  margin: 0; min-height: 1lh; text-align: left;
+}
+.pt-date-btn { min-width: 0; max-width: 100%; justify-content: flex-start; text-align: left; }
+.pt-date-btn .pt-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Docks de navigation, à poser dans le layout de l'app */
+.pt-tabbar-dock {
+  position: fixed; z-index: 40; left: var(--space-4); right: var(--space-4);
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+}
+.pt-sidebar-dock { position: fixed; z-index: 30; left: 8px; top: 8px; bottom: 8px; display: flex; }
+.pt-sidebar-dock .pt-sidebar { height: 100%; }
+
+/* Liste libre (lignes qui ne sont pas des ListRow : glisser pour supprimer, formulaires…) :
+   séparateurs de 0,5 px qui commencent au niveau du texte, comme ListRow. */
+.pt-list-inset > li + li { position: relative; }
+.pt-list-inset > li + li::before {
+  content: ""; position: absolute; z-index: 1; top: 0; right: 0; left: var(--sep-inset, 58px);
+  border-top: 0.5px solid var(--separator); pointer-events: none;
+}
+
+/* Jauges : variantes d'état (objectif dépassé, quota presque atteint…) */
+.pt-tile-bar.is-warn > span { background: var(--warning); }
+.pt-tile-bar.is-over > span { background: var(--danger); }

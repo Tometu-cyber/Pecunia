@@ -9,6 +9,7 @@ Une ligne de liste : un repère à gauche (pictogramme dans une pastille teinté
 - `value` : la donnée à droite (« 45 min », « −650 € »).
 - `tone` : couleur de la valeur. `positive` (vert, revenus), `negative` (texte noir en gras, dépenses : jamais en rouge, réservé aux erreurs), `app` (couleur de l'app, échéances), `strong` (texte normal en gras : soldes, totaux).
 - `onClick` : rend la ligne cliquable et affiche le chevron (`chevron: false` pour le masquer).
+- `href` : la ligne devient un lien (`<a>`, ou le composant de lien de l'app : voir `setLinkComponent` dans le README général). Mêmes styles, survol et focus qu'en bouton. Le chevron s'affiche aussi.
 
 **Règles :**
 - Hauteur minimum 44 px.
