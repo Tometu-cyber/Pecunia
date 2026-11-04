@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, LogOut } from "lucide-react";
+import { Download, LogOut, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type ReactNode } from "react";
 import { signOut, updateProfile } from "@/lib/data/actions";
@@ -40,15 +40,28 @@ export function SettingsForm({ profile }: { profile: Profile }) {
     });
   }
 
-  // Réponse immédiate : le thème s'applique tout de suite (fondu court), l'enregistrement suit
-  function changeTheme(theme: Profile["theme"]) {
+  // Réponse immédiate : le thème et le contrôle changent tout de suite (fondu court),
+  // l'enregistrement suit en arrière-plan, sans message (le changement se voit déjà).
+  // En cas d'échec, retour au thème précédent et message d'erreur.
+  const [theme, setTheme] = useState(profile.theme);
+  function applyTheme(next: Profile["theme"]) {
     const apply = () => {
-      document.documentElement.dataset.theme = theme;
+      document.documentElement.dataset.theme = next;
     };
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if ("startViewTransition" in document && !reduce) document.startViewTransition(apply);
     else apply();
-    save({ theme });
+  }
+  function changeTheme(next: Profile["theme"]) {
+    const previous = theme;
+    setTheme(next);
+    applyTheme(next);
+    void updateProfile({ theme: next }).then((r) => {
+      if (r.ok) return;
+      setTheme(previous);
+      applyTheme(previous);
+      toast(r.error, "error");
+    });
   }
 
   const lastBackup = profile.lastBackupAt
@@ -85,7 +98,7 @@ export function SettingsForm({ profile }: { profile: Profile }) {
           </Row>
           <Row label="Thème">
             <Segmented
-              value={profile.theme}
+              value={theme}
               onChange={changeTheme}
               options={[
                 { value: "light", label: "Clair" },
@@ -120,13 +133,14 @@ export function SettingsForm({ profile }: { profile: Profile }) {
           <Row label="Utilisateur">
             <span className="text-body text-label-secondary">{profile.email}</span>
           </Row>
-          <div className="py-1">
+          {/* mêmes capsules que les autres actions de la page : retour au toucher immédiat */}
+          <Row label="Session" hint="Il faudra te reconnecter sur cet appareil">
             <form action={signOut}>
-              <SubmitButton className="inline-flex min-h-11 items-center gap-2 text-body text-danger-text md:min-h-7" pendingChildren="Déconnexion…">
-                <LogOut size={18} strokeWidth={1.75} aria-hidden /> Se déconnecter
+              <SubmitButton className={buttonClass("secondary")} pendingChildren="Se déconnecter">
+                <LogOut size={15} strokeWidth={1.75} aria-hidden /> Se déconnecter
               </SubmitButton>
             </form>
-          </div>
+          </Row>
           <Row label="Supprimer le compte" hint="Efface définitivement toutes tes données">
             <DeleteAccountButton email={profile.email} />
           </Row>
@@ -205,8 +219,8 @@ function DeleteAccountButton({ email }: { email: string }) {
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="inline-flex min-h-11 items-center text-body text-danger-text hover:underline md:min-h-7">
-        Supprimer…
+      <button type="button" onClick={() => setOpen(true)} className={buttonClass("danger")}>
+        <Trash2 size={15} strokeWidth={1.75} aria-hidden /> Supprimer
       </button>
       <Modal
         open={open}

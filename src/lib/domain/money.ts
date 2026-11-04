@@ -71,6 +71,22 @@ export function parseAmountToCents(input: string): number | null {
   return minus ? -cents : cents;
 }
 
+/**
+ * Recherche par montant : la saisie est-elle un début de montant qui correspond ?
+ * « 10 » → 10,00 à 10,99 € (pas 100 ni 210) ; « 10,5 » → 10,50 à 10,59 € ; « 10,50 » → 10,50 €.
+ * Le signe est ignoré (dépense ou entrée). Renvoie false si la saisie n'est pas un montant.
+ */
+export function matchesAmountQuery(cents: number, query: string): boolean {
+  const q = query.replace(/[\s\u00a0\u202f€+\-−]/g, "").replace(".", ",");
+  const match = /^(\d+)(?:,(\d{0,2}))?$/.exec(q);
+  if (!match) return false;
+  const [, euros, frac] = match;
+  const abs = Math.abs(cents);
+  if (Math.floor(abs / 100) !== Number(euros)) return false;
+  if (!frac) return true;
+  return String(abs % 100).padStart(2, "0").startsWith(frac);
+}
+
 /** Pourcentage lisible : 0.3815 → « 38,1 % » */
 export function formatPercent(ratio: number, fractionDigits = 1): string {
   return new Intl.NumberFormat("fr-FR", {

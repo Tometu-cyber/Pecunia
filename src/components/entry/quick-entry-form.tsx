@@ -303,7 +303,7 @@ export function QuickEntryForm({
         ))}
 
       <div className={clsx("flex flex-col gap-3", !isSheet && "md:flex-row md:items-end")}>
-        <Segmented value={kind} options={KIND_OPTIONS} onChange={changeKind} className={isSheet ? "w-full" : "md:w-auto"} />
+        <Segmented value={kind} options={KIND_OPTIONS} onChange={changeKind} className={isSheet ? "w-full" : "md:h-[38px] md:w-auto"} />
         <div className="flex-1">
           {!isSheet && <Label htmlFor="entry-amount">Montant</Label>}
           <div

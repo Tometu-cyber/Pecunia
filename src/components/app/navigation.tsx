@@ -165,7 +165,7 @@ export function ContentFrame({ children }: { children: ReactNode }) {
       // barre d'onglets : hauteur + écart avec le bas + space-8 de respiration
       style={{ "--content-pb": "calc(var(--tabbar-height) + var(--space-4) + var(--space-8) + env(safe-area-inset-bottom, 0px))" } as CSSProperties}
     >
-      {fullBleed ? children : <div className="px-4 md:max-w-[calc(var(--content-max)+44px)] md:px-5 md:pb-7">{children}</div>}
+      {fullBleed ? children : <div className="px-4 md:mx-auto md:max-w-[calc(var(--content-max)+44px)] md:px-5 md:pb-7">{children}</div>}
     </main>
   );
 }

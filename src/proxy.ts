@@ -24,10 +24,11 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // Rafraîchit la session ; ne rien exécuter entre la création du client et cet appel.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Rafraîchit la session si besoin ; ne rien exécuter entre la création du client et cet appel.
+  // getClaims vérifie le jeton sur place (pas d'aller-retour vers le serveur d'authentification
+  // avec des clés asymétriques ; sinon il retombe sur getUser).
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims?.sub ? data.claims : null;
 
   const path = request.nextUrl.pathname;
   const isPublic = PUBLIC_PATHS.some((p) => path === p || path.startsWith(`${p}/`));

@@ -1,6 +1,6 @@
 import { Plus, Upload } from "lucide-react";
-import { getAppData, getTransactions } from "@/lib/data/queries";
-import { resolveMonth } from "@/lib/data/views";
+import { getAccounts, getTransactions } from "@/lib/data/queries";
+import { resolveMonth, withStartDay } from "@/lib/data/views";
 import { monthPeriod } from "@/lib/domain/dates";
 import { MonthSwitcher } from "@/components/app/filters";
 import { GlassButton } from "@/components/ui/glass-button";
@@ -15,10 +15,15 @@ export default async function TransactionsPage({
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const params = await searchParams;
-  const { profile, accounts } = await getAppData();
+  // comptes, transactions du mois et profil en même temps (jour de début de mois deviné puis vérifié)
+  const {
+    profile,
+    data: [accounts, txs],
+  } = await withStartDay((day) => {
+    const period = monthPeriod(resolveMonth(params.mois, day).month, day);
+    return Promise.all([getAccounts(), getTransactions({ from: period.start, to: period.end })]);
+  });
   const { month, current } = resolveMonth(params.mois, profile.monthStartDay);
-  const period = monthPeriod(month, profile.monthStartDay);
-  const txs = await getTransactions({ from: period.start, to: period.end });
   const initialAccount = accounts.some((a) => a.id === params.compte) ? params.compte! : null;
 
   const importHref = initialAccount ? `/import?compte=${initialAccount}` : "/import";

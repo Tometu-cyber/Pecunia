@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
-import { getAppData, getTransactions } from "@/lib/data/queries";
-import { resolveMonth } from "@/lib/data/views";
+import { getTransactions, loadData } from "@/lib/data/queries";
+import { resolveMonth, withStartDay } from "@/lib/data/views";
 import { addMonths, isInPeriod, lastMonths, monthAbbr, monthName, monthPeriod } from "@/lib/domain/dates";
 import { categorySeries, compareMonths, savingsByAccount } from "@/lib/domain/analyses";
 import { formatCents, formatPercent } from "@/lib/domain/money";
@@ -14,11 +14,19 @@ export const metadata = { title: "Analyses" };
 
 export default async function AnalysesPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
-  const { profile, accounts, categories, balances } = await getAppData();
+  // profil, données et transactions en même temps (jour de début de mois deviné puis vérifié)
+  const {
+    profile,
+    data: [{ accounts, categories, balances }, txs],
+  } = await withStartDay((day) =>
+    Promise.all([
+      loadData("accounts", "categories", "balances"),
+      getTransactions({ from: monthPeriod(lastMonths(resolveMonth(params.mois, day).month, 12)[0]!, day).start }),
+    ]),
+  );
   const startDay = profile.monthStartDay;
   const { month, current } = resolveMonth(params.mois, startDay);
   const months = lastMonths(month, 12);
-  const txs = await getTransactions({ from: monthPeriod(months[0]!, startDay).start });
 
   const period = monthPeriod(month, startDay);
   const prevPeriod = monthPeriod(addMonths(month, -1), startDay);

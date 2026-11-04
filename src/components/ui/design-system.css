@@ -331,6 +331,13 @@ button.pt-row:focus-visible, a.pt-row:focus-visible { outline: 2px solid var(--a
   font: 400 17px/22px var(--font-sans); letter-spacing: -0.43px; text-align: left; cursor: pointer;
 }
 .pt-menu-item:hover, .pt-menu-item:focus-visible { background: var(--fill-secondary); outline: none; }
+/* Select : choix actif au clavier ; le survol suit le choix actif (pas deux lignes surlignées) */
+.pt-menu-item.is-active { background: var(--fill-secondary); }
+[role="listbox"] .pt-menu-item:hover:not(.is-active) { background: transparent; }
+.pt-menu-small .pt-menu-item.is-active { background: var(--tint); color: #ffffff; }
+.pt-menu-small .pt-menu-item.is-active .pt-menu-check { color: #ffffff; }
+[role="listbox"].pt-menu-small .pt-menu-item:hover:not(.is-active) { background: transparent; color: var(--label); }
+[role="listbox"].pt-menu-small .pt-menu-item:hover:not(.is-active) .pt-menu-check { color: var(--label); }
 .pt-menu-item.is-danger { color: var(--danger-text); }
 .pt-menu-item[aria-disabled="true"] { color: var(--label-tertiary); cursor: default; background: transparent; }
 .pt-menu-check { flex: none; width: 16px; display: inline-flex; color: var(--label); }

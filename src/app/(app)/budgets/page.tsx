@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { getAppData, getBudgets } from "@/lib/data/queries";
-import { getBudgetOverview, resolveMonth } from "@/lib/data/views";
+import { getAccounts, getBudgets, getCategories } from "@/lib/data/queries";
+import { getBudgetOverview, resolveMonth, withStartDay } from "@/lib/data/views";
 import { budgetAccountIds } from "@/lib/domain/budgets";
 import { formatCents, formatPercent } from "@/lib/domain/money";
 import { shortAccountName } from "@/lib/domain/accounts";
@@ -14,9 +14,15 @@ export const metadata = { title: "Budgets" };
 
 export default async function BudgetsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
-  const { profile, accounts, categories } = await getAppData();
+  // profil, comptes, catégories, budgets et transactions du mois en même temps
+  // (jour de début de mois deviné puis vérifié)
+  const {
+    profile,
+    data: [accounts, categories, budgets, overview],
+  } = await withStartDay((day) =>
+    Promise.all([getAccounts(), getCategories(), getBudgets(), getBudgetOverview(resolveMonth(params.mois, day).month, undefined, day)]),
+  );
   const { month, current } = resolveMonth(params.mois, profile.monthStartDay);
-  const [overview, budgets] = await Promise.all([getBudgetOverview(month), getBudgets()]);
   const accountById = new Map(accounts.map((a) => [a.id, a]));
   const unbudgeted = categories.filter((c) => !c.archivedAt && !c.isIncome && !budgets.some((b) => b.categoryId === c.id));
 
@@ -78,7 +84,11 @@ export default async function BudgetsPage({ searchParams }: { searchParams: Prom
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
                           <p className="truncate text-body">{l.category.name}</p>
-                          <p className={`text-body font-semibold tabular-nums ${statusText[l.status]}`}>{formatPercent(Math.min(l.ratio, 9.99), 0)}</p>
+                          {/* budget à 0 € : ratio infini, « Dépassé » seul ; vrai budget dépassé : « Dépassé 462 % ». « Dépassé » reste en petit */}
+                          <p className={`flex shrink-0 items-baseline gap-1.5 tabular-nums ${Number.isFinite(l.ratio) ? statusText[l.status] : "text-danger-text"}`}>
+                            {(!Number.isFinite(l.ratio) || l.remainingCents < 0) && <span className="text-foot font-medium">Dépassé</span>}
+                            {Number.isFinite(l.ratio) && <span className="text-body font-semibold">{formatPercent(Math.min(l.ratio, 9.99), 0)}</span>}
+                          </p>
                         </div>
                         <p className="text-sub text-label-secondary">
                           {accountNames.join(" + ")}
