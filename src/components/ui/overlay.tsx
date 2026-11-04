@@ -3,6 +3,7 @@
 import { clsx } from "clsx";
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { CircleAlert, CircleCheck, X } from "lucide-react";
+import { createPortal } from "react-dom";
 import { animateSpring, project, rubberband, SPRINGS, velocityFrom, type SpringAnimation, type SpringConfig } from "@/lib/motion/spring";
 
 /** Préférence système « réduire les animations ». */
@@ -192,8 +193,10 @@ export function Modal({
   if (!mounted) return null;
   const { title: shownTitle, children: shownChildren, footer: shownFooter } = content.current;
   const dragProps = { onPointerDown, onPointerMove, onPointerUp, onPointerCancel: onPointerUp };
-  return (
-    <div className={clsx("fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-6", !open && "pointer-events-none")} role="presentation">
+  // Rendue à la racine du document : ouverte depuis un en-tête collant (contexte d'empilement
+  // à part), la feuille passait sous la barre d'onglets. pt-app-finances : couleur d'accent.
+  return createPortal(
+    <div className={clsx("pt-app-finances fixed inset-0 z-[90] flex items-end justify-center md:items-center md:p-6", !open && "pointer-events-none")} role="presentation">
       <div ref={scrimRef} className="absolute inset-0 bg-glass-dim" style={{ opacity: 0 }} onClick={onClose} aria-hidden />
       <div
         ref={panelRef}
@@ -227,7 +230,8 @@ export function Modal({
         <div className="overflow-y-auto overscroll-contain px-4 py-4 md:px-5">{shownChildren}</div>
         {shownFooter && <div className="flex justify-end gap-2 border-t-[0.5px] border-separator px-4 py-3 md:px-5">{shownFooter}</div>}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -262,7 +266,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={push}>
       {children}
       <div
-        className="pointer-events-none fixed inset-x-0 bottom-[calc(96px+env(safe-area-inset-bottom,0px))] z-[60] flex flex-col items-center gap-2 px-4 md:bottom-6"
+        className="pointer-events-none fixed inset-x-0 bottom-[calc(96px+env(safe-area-inset-bottom,0px))] z-[95] flex flex-col items-center gap-2 px-4 md:bottom-6"
         aria-live="polite"
       >
         {toasts.map((t) => (

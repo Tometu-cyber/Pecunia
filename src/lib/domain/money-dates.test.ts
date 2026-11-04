@@ -1,11 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { centsToInput, formatCents, formatCentsCompact, parseAmountToCents, sanitizeAmountInput } from "./money";
+import { centsToInput, formatCents, formatCentsCompact, matchesAmountQuery, parseAmountToCents, sanitizeAmountInput } from "./money";
 import { addMonths, dayLabel, isValidIsoDate, lastMonths, monthKeyOf, monthLabel, monthPeriod } from "./dates";
 
 // Intl fr-FR utilise des espaces insécables : on les normalise pour comparer.
 const plain = (s: string) => s.replace(/[  ]/g, " ");
 
 describe("money", () => {
+  it("recherche par montant", () => {
+    expect(matchesAmountQuery(1000, "10")).toBe(true);
+    expect(matchesAmountQuery(-1099, "10")).toBe(true);
+    expect(matchesAmountQuery(10000, "10")).toBe(false);
+    expect(matchesAmountQuery(21000, "10")).toBe(false);
+    expect(matchesAmountQuery(1055, "10,5")).toBe(true);
+    expect(matchesAmountQuery(1065, "10,5")).toBe(false);
+    expect(matchesAmountQuery(1050, "10.50")).toBe(true);
+    expect(matchesAmountQuery(1050, "10,50 €")).toBe(true);
+    expect(matchesAmountQuery(105000, "1 050")).toBe(true);
+    expect(matchesAmountQuery(1000, "courses")).toBe(false);
+    expect(matchesAmountQuery(1000, "")).toBe(false);
+  });
   it("formate en euros avec signe typographique", () => {
     expect(plain(formatCents(105000))).toBe("1 050,00 €");
     expect(plain(formatCents(-8430))).toBe("−84,30 €");
