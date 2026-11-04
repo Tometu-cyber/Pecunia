@@ -1,6 +1,6 @@
 {
   "name": "pecunia",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Pecunia - suivi des finances personnelles (saisie manuelle, budgets, prévisionnel)",
   "author": "Tom Courgenay",
