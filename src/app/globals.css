@@ -417,6 +417,21 @@ body {
   color: var(--label);
 }
 
+/* Navigation en cours (changement de filtre, de mois, de page) : le contenu s'estompe un peu
+   après 120 ms, pour ne pas clignoter quand la réponse est quasi immédiate. */
+main {
+  transition: opacity 180ms ease-out;
+}
+html[data-navigating] main {
+  opacity: 0.55;
+  transition-delay: 120ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  main {
+    transition: none;
+  }
+}
+
 html {
   /* retour visuel géré par l'app (états :active) ; pas de délai de 300 ms au toucher */
   -webkit-tap-highlight-color: transparent;

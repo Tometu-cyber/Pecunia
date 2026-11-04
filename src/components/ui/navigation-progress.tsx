@@ -54,6 +54,11 @@ export function NavigationProgress() {
     return () => clearTimeout(t);
   }, [pathname, searchParams]);
 
+  // contenu estompé pendant le chargement (voir globals.css) : on voit que ça charge
+  useEffect(() => {
+    document.documentElement.toggleAttribute("data-navigating", phase === "loading");
+  }, [phase]);
+
   return (
     <div
       aria-hidden
