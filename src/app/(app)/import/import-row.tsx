@@ -8,6 +8,7 @@ import { numericDate } from "@/lib/domain/dates";
 import { sanitizeAmountInput } from "@/lib/domain/money";
 import type { ExistingLine } from "@/lib/domain/csv-import";
 import type { Account, Category } from "@/lib/domain/types";
+import { Select } from "@/components/ui/select";
 
 // cellule éditable du tableau d'import (ordi) : champ compact façon macOS, fond au survol
 const cell = "h-7 w-full rounded-xs border border-transparent bg-transparent px-2 text-[13px] text-label hover:bg-fill-tertiary focus:border-finances focus:bg-bg-tertiary focus:shadow-[0_0_0_3px_var(--finances-bg)] focus:outline-none";
@@ -61,13 +62,13 @@ export const ImportRowView = memo(function ImportRowView({
         <input type="date" value={row.date} onChange={(e) => actions.update(row.key, { date: e.target.value })} className={cell} aria-label="Date" />
       </td>
       <td className="w-36">
-        <select
+        <Select
+          variant="cell"
           value={row.type}
           onChange={(e) => {
             const type = e.target.value as DraftType;
             actions.update(row.key, { type, categoryId: isTransferType(type) || type === "interest" ? null : row.categoryId });
           }}
-          className={cell}
           aria-label="Type"
         >
           {typeOptions.map((t) => (
@@ -75,17 +76,17 @@ export const ImportRowView = memo(function ImportRowView({
               {DRAFT_TYPE_LABELS[t]}
             </option>
           ))}
-        </select>
+        </Select>
       </td>
       <td className="min-w-48">
         <input value={row.label} onChange={(e) => actions.update(row.key, { label: e.target.value })} className={cell} aria-label="Libellé" placeholder="Libellé" />
       </td>
       <td className="w-44">
         {isTransferType(row.type) ? (
-          <select
+          <Select
+            variant="cell"
             value={row.counterpartId ?? ""}
             onChange={(e) => actions.update(row.key, { counterpartId: e.target.value || null })}
-            className={cell}
             aria-label="Autre compte"
           >
             <option value="">Compte…</option>
@@ -94,14 +95,14 @@ export const ImportRowView = memo(function ImportRowView({
                 {a.name}
               </option>
             ))}
-          </select>
+          </Select>
         ) : row.type === "interest" ? (
           <span className="px-2 text-foot text-label-secondary">Revenu d&apos;épargne</span>
         ) : (
-          <select
+          <Select
+            variant="cell"
             value={row.categoryId ?? ""}
             onChange={(e) => actions.setCategory(row.key, e.target.value || null)}
-            className={cell}
             aria-label="Catégorie"
           >
             <option value="">Catégorie…</option>
@@ -110,7 +111,7 @@ export const ImportRowView = memo(function ImportRowView({
                 {c.name}
               </option>
             ))}
-          </select>
+          </Select>
         )}
       </td>
       <td className="w-32">

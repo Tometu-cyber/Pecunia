@@ -6,7 +6,7 @@
 import { clsx } from "clsx";
 import Link from "next/link";
 import { TriangleAlert, X } from "lucide-react";
-import type { ButtonHTMLAttributes, ComponentProps, ReactNode, SelectHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes, ComponentProps, ReactNode } from "react";
 import type { BudgetStatus } from "@/lib/domain/budgets";
 import { ScreenHeader } from "@/components/app/screen-header";
 import { SegmentedControl } from "./segmented-control";
@@ -124,13 +124,8 @@ export function Input({ className, ...props }: ComponentProps<"input">) {
   return <input className={clsx(inputClass, className)} {...props} />;
 }
 
-export function Select({ className, children, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <select className={clsx(inputClass, "pt-select pr-9 md:pr-7", className)} {...props}>
-      {children}
-    </select>
-  );
-}
+/** Liste déroulante du design system (menu en verre), voir ./select.tsx. */
+export { Select } from "./select";
 
 export function FieldError({ children }: { children?: ReactNode }) {
   if (!children) return null;

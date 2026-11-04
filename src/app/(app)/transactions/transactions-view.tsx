@@ -6,7 +6,7 @@ import { useAppData } from "@/components/app/app-data";
 import { Chip, EmptyState, Segmented, Select } from "@/components/ui/primitives";
 import { Amount } from "@/components/ui/money";
 import { dayLabel } from "@/lib/domain/dates";
-import { formatCents } from "@/lib/domain/money";
+import { formatCents, matchesAmountQuery } from "@/lib/domain/money";
 import { shortAccountName } from "@/lib/domain/accounts";
 import { groupByDay, signedTotal } from "@/lib/domain/stats";
 import type { Transaction } from "@/lib/domain/types";
@@ -34,7 +34,8 @@ export function TransactionsView({ transactions, initialAccount }: { transaction
       if (type === "in" && t.type !== "in" && t.type !== "interest") return false;
       if (type === "transfer" && t.type !== "transfer") return false;
       if (categoryId && t.categoryId !== categoryId) return false;
-      if (q && !`${t.place ?? ""} ${t.note ?? ""}`.toLocaleLowerCase("fr-FR").includes(q)) return false;
+      // un lieu, une note, ou un montant (« 10 » trouve 10,00 à 10,99 €)
+      if (q && !`${t.place ?? ""} ${t.note ?? ""}`.toLocaleLowerCase("fr-FR").includes(q) && !matchesAmountQuery(t.amountCents, q)) return false;
       return true;
     });
   }, [transactions, search, accountId, type, categoryId]);
@@ -52,11 +53,11 @@ export function TransactionsView({ transactions, initialAccount }: { transaction
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher un lieu, une note"
+              placeholder="Lieu, note ou montant"
               className="block min-h-11 w-full rounded-full border border-transparent bg-fill-tertiary pr-3 pl-9 text-[17px] text-label placeholder:text-label-tertiary focus:border-finances focus:bg-bg-tertiary focus:shadow-[0_0_0_4px_var(--finances-bg)] focus:outline-none md:min-h-7 md:pl-8 md:text-[13px]"
             />
           </label>
-          <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} aria-label="Catégorie" className="hidden md:block">
+          <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} aria-label="Catégorie" className="hidden md:flex">
             <option value="">Toutes les catégories</option>
             {activeCategories.map((c) => (
               <option key={c.id} value={c.id}>
