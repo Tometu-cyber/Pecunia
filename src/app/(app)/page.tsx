@@ -1,5 +1,5 @@
-import { getForecastDecisions, getProfile, getTransactions, loadData } from "@/lib/data/queries";
-import { getBudgetOverview, resolveMonth, withParams } from "@/lib/data/views";
+import { getBudgets, getForecastDecisions, getTransactions, loadData } from "@/lib/data/queries";
+import { getBudgetOverview, resolveMonth, withParams, withStartDay } from "@/lib/data/views";
 import { addMonths, isInPeriod, lastMonths, monthAbbr, monthKeyOf, monthLabel, monthPeriod, todayIso } from "@/lib/domain/dates";
 import { recurrenceKey } from "@/lib/domain/forecast";
 import { buildOccurrences, signedRecurrenceCents } from "@/lib/domain/recurrences";
@@ -18,20 +18,24 @@ export const metadata = { title: "Tableau de bord" };
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
-  // Le profil seul d'abord (jour de début de mois), puis tout le reste en parallèle
-  const profile = await getProfile();
+  const today = todayIso();
+  // Tout part en même temps que le profil (jour de début de mois deviné puis vérifié)
+  const {
+    profile,
+    data: [{ accounts, categories, balances, recurrences, forecastItems }, txs, decisions],
+  } = await withStartDay((day) =>
+    Promise.all([
+      loadData("accounts", "categories", "balances", "recurrences", "forecastItems"),
+      // Depuis le début de la fenêtre de 12 mois jusqu'à aujourd'hui (sparklines reconstruites à rebours)
+      getTransactions({ from: monthPeriod(lastMonths(resolveMonth(params.mois, day).month, 12)[0]!, day).start }),
+      getForecastDecisions(monthKeyOf(today, day)),
+      getBudgets(), // pour getBudgetOverview plus bas, déjà en cache
+    ]),
+  );
   const startDay = profile.monthStartDay;
   const { month, current } = resolveMonth(params.mois, startDay);
   const months = lastMonths(month, 12);
   const period = monthPeriod(month, startDay);
-  const windowStart = monthPeriod(months[0]!, startDay).start;
-  const today = todayIso();
-  const [{ accounts, categories, balances, recurrences, forecastItems }, txs, decisions] = await Promise.all([
-    loadData("accounts", "categories", "balances", "recurrences", "forecastItems"),
-    // Depuis le début de la fenêtre de 12 mois jusqu'à aujourd'hui (sparklines reconstruites à rebours)
-    getTransactions({ from: windowStart }),
-    getForecastDecisions(monthKeyOf(today, startDay)),
-  ]);
   const activeAccounts = accounts.filter((a) => !a.archivedAt);
   const accountId = activeAccounts.some((a) => a.id === params.compte) ? params.compte! : null;
   const monthTxs = txs.filter((t) => isInPeriod(t.date, period));

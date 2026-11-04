@@ -12,7 +12,7 @@ import { defaultInBudget } from "@/lib/domain/defaults";
 import type { Transaction } from "@/lib/domain/types";
 import { getAccounts, getBalances, getBudgets, getCategories, getProfile, getSession, getTransactions } from "./queries";
 import { transactionToRow } from "./mappers";
-import { THEME_COOKIE } from "@/lib/theme";
+import { MONTH_START_COOKIE, THEME_COOKIE } from "@/lib/theme";
 
 export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string };
 
@@ -451,6 +451,8 @@ export async function updateProfile(input: z.input<typeof profileSchema>): Promi
   const { error } = await supabase.from("profiles").update(patch).eq("id", user.id);
   if (error) return fail(GENERIC_ERROR);
   // Le thème est aussi gardé en cookie pour être appliqué dès le 1er rendu (y compris écran de connexion)
+  if (v.monthStartDay)
+    (await cookies()).set(MONTH_START_COOKIE, String(v.monthStartDay), { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
   if (v.theme) (await cookies()).set(THEME_COOKIE, v.theme, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
   refresh();
   return ok(undefined);

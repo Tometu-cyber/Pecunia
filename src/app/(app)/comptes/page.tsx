@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { getGoals, getProfile, getTransactions, loadData } from "@/lib/data/queries";
-import { resolveMonth } from "@/lib/data/views";
+import { getGoals, getTransactions, loadData } from "@/lib/data/queries";
+import { resolveMonth, withStartDay } from "@/lib/data/views";
 import { addMonths, lastMonths, monthAbbr, monthPeriod, todayIso } from "@/lib/domain/dates";
 import { goalStatus } from "@/lib/domain/goals";
 import { ACCOUNT_TYPE_LABELS } from "@/lib/domain/defaults";
@@ -16,17 +16,22 @@ import { GoalsSection } from "@/components/accounts/goals-section";
 export const metadata = { title: "Comptes" };
 
 export default async function AccountsPage() {
-  const profile = await getProfile();
+  // profil, comptes, objectifs et transactions en même temps (jour de début de mois deviné puis vérifié)
+  const {
+    profile,
+    data: [{ accounts, balances, recurrences }, goals, txs],
+  } = await withStartDay((day) =>
+    Promise.all([
+      loadData("accounts", "balances", "recurrences"),
+      getGoals(),
+      getTransactions({ from: monthPeriod(lastMonths(resolveMonth(undefined, day).current, 12)[0]!, day).start }),
+    ]),
+  );
   const startDay = profile.monthStartDay;
   const { current } = resolveMonth(undefined, startDay);
   const months = lastMonths(current, 12);
   const ends = months.map((m) => monthPeriod(m, startDay).end);
   const yearAgoEnd = monthPeriod(addMonths(current, -12), startDay).end;
-  const [{ accounts, balances, recurrences }, goals, txs] = await Promise.all([
-    loadData("accounts", "balances", "recurrences"),
-    getGoals(),
-    getTransactions({ from: monthPeriod(months[0]!, startDay).start }),
-  ]);
 
   const active = accounts.filter((a) => !a.archivedAt);
   const archived = accounts.filter((a) => a.archivedAt);
