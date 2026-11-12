@@ -24,7 +24,8 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const theme = (await cookies()).get(THEME_COOKIE)?.value === "dark" ? "dark" : "light";
+  // Sombre par défaut (pas de cookie = première visite) ; seul « clair » choisi explicitement l'emporte
+  const theme = (await cookies()).get(THEME_COOKIE)?.value === "light" ? "light" : "dark";
   return (
     <html lang="fr" data-theme={theme}>
       {/* pt-app-finances : couleur d'accent de Pecunia, aussi pour Modal et Select rendus à la racine */}
