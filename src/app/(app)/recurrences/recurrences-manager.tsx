@@ -13,9 +13,9 @@ import { useAppData } from "@/components/app/app-data";
 import { RecurrenceFormModal } from "@/components/planning/recurrence-form";
 import { IconBadge } from "@/components/ui/icons";
 import { Amount } from "@/components/ui/money";
-import { useToast } from "@/components/ui/overlay";
 import { Button, Card, CardHeader, EmptyState } from "@/components/ui/primitives";
-import { Spinner } from "@/components/ui/spinner";
+import { Spinner } from "@portail/ui";
+import { useToast } from "@/components/ui/toasts";
 
 export function RecurrencesManager({
   recurrences,

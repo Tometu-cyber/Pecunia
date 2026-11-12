@@ -1,7 +1,7 @@
 import { getClientAppData } from "@/lib/data/queries";
 import { AppDataProvider } from "@/components/app/app-data";
 import { BottomNav, ContentFrame, Sidebar } from "@/components/app/navigation";
-import { ToastProvider } from "@/components/ui/overlay";
+import { ToastProvider } from "@/components/ui/toasts";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const data = await getClientAppData();

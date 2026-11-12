@@ -1,6 +1,5 @@
 "use client";
 
-import { GlassButton } from "@/components/ui/glass-button";
 import { clsx } from "clsx";
 import { Archive, Pencil, SlidersHorizontal, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -18,8 +17,9 @@ import { adjustmentCents } from "@/lib/domain/entries";
 import { centsToInput, formatCents, parseAmountToCents, sanitizeAmountInput } from "@/lib/domain/money";
 import type { Account, AccountType } from "@/lib/domain/types";
 import { IconBadge } from "@/components/ui/icons";
-import { Modal, useToast } from "@/components/ui/overlay";
 import { Banner, Button, FieldError, Input, Label, Segmented } from "@/components/ui/primitives";
+import { GlassButton, Modal } from "@portail/ui";
+import { useToast } from "@/components/ui/toasts";
 
 export function IconColorPicker({
   icon,

@@ -11,9 +11,9 @@ import { shortAccountName } from "@/lib/domain/accounts";
 import { groupByDay, signedTotal } from "@/lib/domain/stats";
 import type { Transaction } from "@/lib/domain/types";
 import { TransactionRow } from "@/components/transactions/transaction-row";
-import { SwipeActions } from "@/components/ui/swipe-actions";
 import { deleteTransaction } from "@/lib/data/actions";
 import { EditTransactionModal } from "@/components/transactions/edit-transaction-modal";
+import { DeleteSwipe } from "@/components/ui/delete-swipe";
 
 type TypeFilter = "all" | "out" | "in" | "transfer";
 
@@ -114,7 +114,7 @@ export function TransactionsView({ transactions, initialAccount }: { transaction
                 <ul className="pt-list-inset overflow-hidden rounded-lg bg-bg-grouped-secondary shadow-card">
                   {g.items.map((t) => (
                     <li key={t.id}>
-                      <SwipeActions
+                      <DeleteSwipe
                         label={`Supprimer ${t.place || "la transaction"}`}
                         successMessage={t.type === "transfer" ? "Virement supprimé" : "Transaction supprimée"}
                         onDelete={() => deleteTransaction(t.id)}
@@ -127,7 +127,7 @@ export function TransactionsView({ transactions, initialAccount }: { transaction
                           counterpart={t.counterpartAccountId ? accountById.get(t.counterpartAccountId) : undefined}
                           onClick={() => setEditing(t)}
                         />
-                      </SwipeActions>
+                      </DeleteSwipe>
                     </li>
                   ))}
                 </ul>

@@ -3,10 +3,8 @@
 /** Carte « Dépenses mensuelles » : bascule 6 / 12 mois, le dernier mois mis en avant. */
 import { useState } from "react";
 import { formatCents } from "@/lib/domain/money";
-import { BarChart } from "@/components/ui/bar-chart";
-import { Card } from "@/components/ui/card";
-import { PECUNIA_APP } from "@/components/ui/ds";
-import { SegmentedControl } from "@/components/ui/segmented-control";
+import { BarChart, Card, SegmentedControl } from "@portail/ui";
+import { PECUNIA_APP } from "@/components/ui/app";
 
 /** 1 300 € → « 1,3 k€ » ; en dessous de 1 000 €, montant complet */
 function formatEuros(v: number): string {

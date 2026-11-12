@@ -14,12 +14,11 @@ import { shortDate } from "@/lib/domain/dates";
 import { formatList } from "@/lib/domain/text";
 import { Sparkline } from "@/components/charts/sparkline";
 import { iconFor } from "@/components/ui/icons";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Glyph, PECUNIA_APP } from "@/components/ui/ds";
-import { List, ListRow } from "@/components/ui/list";
 import { DashboardHeader, AccountFilter, type FilterOption } from "./dashboard-header";
 import { MonthlyBarsCard } from "./monthly-bars-card";
+import { Button, Card, Glyph, List, ListRow } from "@portail/ui";
+import Link from "next/link";
+import { PECUNIA_APP } from "@/components/ui/app";
 
 export interface UpcomingItem {
   key: string;
@@ -68,7 +67,7 @@ function Empty({ children, action }: { children: ReactNode; action?: { label: st
     <div className="flex flex-col items-start gap-1 rounded-md bg-fill-tertiary p-4 text-[15px] leading-5 tracking-[-0.23px] text-label-secondary">
       <p>{children}</p>
       {action && (
-        <Button variant="plain" size="small" href={action.href} className="-ml-2">
+        <Button variant="plain" size="small" linkAs={Link} href={action.href} className="-ml-2">
           {action.label}
         </Button>
       )}
@@ -117,6 +116,7 @@ function AccountsCard({ rows, netWorth, netWorthYearAgo, sparklines }: { rows: A
             icon={iconFor(account.icon)}
             title={account.name}
             subtitle={`${ACCOUNT_TYPE_LABELS[account.type]}${account.inBudget && account.type !== "savings" ? " · dans le budget" : ""}`}
+            linkAs={Link}
             href={`/comptes/${account.id}`}
             chevron={false}
             tone="strong"
@@ -197,6 +197,7 @@ function UpcomingList({ items, accountId, header }: { items: UpcomingItem[]; acc
             subtitle={`${shortDate(u.date)} · ${u.meta}`}
             value={formatCents(u.cents, neutral ? "never" : u.cents > 0 ? "always" : "auto")}
             tone={neutral ? "default" : u.cents > 0 ? "positive" : "negative"}
+            linkAs={Link}
             href="/prevision"
           />
         );
@@ -310,7 +311,7 @@ function AlertsNote({ overs, warns }: { overs: string[]; warns: BudgetLine[] }) 
         {overs.length > 0 && `${formatList(overs)} au-dessus du budget. `}
         {warns.length > 0 && `${formatList(warns.map((w) => `${w.category.name} à ${formatPercent(w.ratio, 0)}`))} - seuil de 80 % franchi.`}
       </p>
-      <Button variant="tinted" size="small" app={PECUNIA_APP} href="/budgets">
+      <Button variant="tinted" size="small" app={PECUNIA_APP} linkAs={Link} href="/budgets">
         Voir les budgets
       </Button>
     </div>
@@ -339,12 +340,13 @@ export function DashboardView(p: DashboardViewProps) {
       {/* ——— Mobile ——— */}
       <div className="flex flex-col gap-3.5 px-4 md:hidden">
         <div className="flex items-center gap-2">
-          <Button variant="gray" size="small" icon={ChevronLeft} href={p.prevHref} aria-label="Mois précédent" className="size-9 !px-0" />
+          <Button variant="gray" size="small" icon={ChevronLeft} linkAs={Link} href={p.prevHref} aria-label="Mois précédent" className="size-9 !px-0" />
           <strong className="min-w-0 text-[20px] leading-[25px] font-semibold tracking-[-0.45px]">{p.monthLabel}</strong>
           <Button
             variant="gray"
             size="small"
             icon={ChevronRight}
+            linkAs={Link}
             href={p.nextHref ?? undefined}
             disabled={!p.nextHref}
             aria-label="Mois suivant"

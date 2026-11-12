@@ -5,10 +5,10 @@
  * de compte, les flèches de mois et « Nouvelle saisie » sur ordi.
  */
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { AppHeader } from "@/components/ui/app-header";
-import { PECUNIA_APP } from "@/components/ui/ds";
 import { useMoreMenuItems } from "@/components/app/navigation";
 import { AccountFilter, type FilterOption } from "@/components/app/account-filter";
+import { AppHeader } from "@portail/ui";
+import { PECUNIA_APP } from "@/components/ui/app";
 
 export { AccountFilter, type FilterOption } from "@/components/app/account-filter";
 

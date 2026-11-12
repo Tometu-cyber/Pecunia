@@ -9,8 +9,9 @@ import type { GoalStatus } from "@/lib/domain/goals";
 import { centsToInput, formatCents, formatPercent, parseAmountToCents, sanitizeAmountInput } from "@/lib/domain/money";
 import type { Goal } from "@/lib/domain/types";
 import { useAppData } from "@/components/app/app-data";
-import { Modal, useToast } from "@/components/ui/overlay";
 import { Button, FieldError, Input, Label, Select } from "@/components/ui/primitives";
+import { Modal } from "@portail/ui";
+import { useToast } from "@/components/ui/toasts";
 
 /** Carte d'un objectif : progression, statut et détail du calcul. */
 export function GoalCard({ status, onClick }: { status: GoalStatus; onClick?: () => void }) {

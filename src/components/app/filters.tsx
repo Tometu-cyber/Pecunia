@@ -1,10 +1,11 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { addMonths, monthLabel, type MonthKey } from "@/lib/domain/dates";
 import type { Account } from "@/lib/domain/types";
-import { Button } from "@/components/ui/button";
 import { withParams } from "@/lib/data/views";
 import { shortAccountName } from "@/lib/domain/accounts";
 import { AccountFilter } from "./account-filter";
+import { Button } from "@portail/ui";
+import Link from "next/link";
 
 /** ‹ Septembre 2026 › - bloqué au-delà du mois courant. Boutons gris ronds du design system. */
 export function MonthSwitcher({
@@ -26,6 +27,7 @@ export function MonthSwitcher({
         variant="gray"
         size="small"
         icon={ChevronLeft}
+        linkAs={Link}
         href={withParams(path, { ...params, mois: addMonths(month, -1) })}
         aria-label="Mois précédent"
         className="size-9 !px-0 md:size-7"
@@ -37,6 +39,7 @@ export function MonthSwitcher({
         variant="gray"
         size="small"
         icon={ChevronRight}
+        linkAs={Link}
         href={canGoNext ? withParams(path, { ...params, mois: next === current ? null : next }) : undefined}
         disabled={!canGoNext}
         aria-label="Mois suivant"

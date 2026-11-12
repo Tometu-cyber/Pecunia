@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { Select } from "@/components/ui/primitives";
 import { startNavigationProgress } from "@/components/ui/navigation-progress";
-import { Spinner } from "@/components/ui/spinner";
+import { Spinner } from "@portail/ui";
 
 /** Choix de la catégorie suivie (paramètre « categorie » de l'URL). */
 export function CategoryPicker({ categories, value }: { categories: { id: string; name: string }[]; value: string | null }) {

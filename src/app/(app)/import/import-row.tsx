@@ -8,7 +8,7 @@ import { numericDate } from "@/lib/domain/dates";
 import { sanitizeAmountInput } from "@/lib/domain/money";
 import type { ExistingLine } from "@/lib/domain/csv-import";
 import type { Account, Category } from "@/lib/domain/types";
-import { Select } from "@/components/ui/select";
+import { Select } from "@portail/ui";
 
 // cellule éditable du tableau d'import (ordi) : champ compact façon macOS, fond au survol
 const cell = "h-7 w-full rounded-xs border border-transparent bg-transparent px-2 text-[13px] text-label hover:bg-fill-tertiary focus:border-finances focus:bg-bg-tertiary focus:shadow-[0_0_0_3px_var(--finances-bg)] focus:outline-none";
