@@ -3,10 +3,9 @@
 import { useState } from "react";
 import { Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatCents } from "@/lib/domain/money";
-import { BarChart } from "@/components/ui/bar-chart";
-import { PECUNIA_APP } from "@/components/ui/ds";
-import { LineChart as DsLineChart } from "@/components/ui/line-chart";
 import { Segmented } from "@/components/ui/primitives";
+import { BarChart, LineChart as DsLineChart } from "@portail/ui";
+import { PECUNIA_APP } from "@/components/ui/app";
 
 /** Info-bulle des graphiques recharts, au style des info-bulles du design system */
 const tooltipStyle = {

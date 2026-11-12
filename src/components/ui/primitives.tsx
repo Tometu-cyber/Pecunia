@@ -9,8 +9,7 @@ import { TriangleAlert, X } from "lucide-react";
 import type { ButtonHTMLAttributes, ComponentProps, ReactNode } from "react";
 import type { BudgetStatus } from "@/lib/domain/budgets";
 import { ScreenHeader } from "@/components/app/screen-header";
-import { SegmentedControl } from "./segmented-control";
-import { Spinner } from "./spinner";
+import { SegmentedControl, Spinner } from "@portail/ui";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 
@@ -125,7 +124,7 @@ export function Input({ className, ...props }: ComponentProps<"input">) {
 }
 
 /** Liste déroulante du design system (menu en verre), voir ./select.tsx. */
-export { Select } from "./select";
+export { Select } from "@portail/ui";
 
 export function FieldError({ children }: { children?: ReactNode }) {
   if (!children) return null;

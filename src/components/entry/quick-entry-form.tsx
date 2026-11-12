@@ -13,11 +13,11 @@ import { normalizeText } from "@/lib/domain/csv-import";
 import { findPlace, suggestPlaces } from "@/lib/domain/places";
 import type { Account, Category, Recurrence } from "@/lib/domain/types";
 import { iconFor } from "@/components/ui/icons";
-import { Spinner } from "@/components/ui/spinner";
 import { Banner, Button, FieldError, Input, Label, Segmented, Select } from "@/components/ui/primitives";
-import { useToast } from "@/components/ui/overlay";
 import { useAppData } from "@/components/app/app-data";
 import { shortAccountName } from "@/lib/domain/accounts";
+import { Spinner } from "@portail/ui";
+import { useToast } from "@/components/ui/toasts";
 
 const KIND_OPTIONS: { value: EntryKind; label: string }[] = [
   { value: "out", label: "− Sortie" },

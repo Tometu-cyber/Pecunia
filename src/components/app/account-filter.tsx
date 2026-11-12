@@ -4,8 +4,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { startNavigationProgress } from "@/components/ui/navigation-progress";
-import { Menu } from "@/components/ui/menu";
-import { SegmentedControl } from "@/components/ui/segmented-control";
+import { Menu, SegmentedControl } from "@portail/ui";
 
 export interface FilterOption {
   id: string;

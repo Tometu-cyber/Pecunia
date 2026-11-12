@@ -8,10 +8,9 @@
  * Les actions sont des éléments déjà rendus (liens, boutons, composants client).
  */
 import type { ReactNode } from "react";
-import { AppHeader } from "@/components/ui/app-header";
-import { PECUNIA_APP } from "@/components/ui/ds";
-import { Menu } from "@/components/ui/menu";
 import { useMoreMenuItems } from "./navigation";
+import { AppHeader, Menu } from "@portail/ui";
+import { PECUNIA_APP } from "@/components/ui/app";
 
 export interface ScreenHeaderProps {
   title: string;

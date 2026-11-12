@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useAppData } from "@/components/app/app-data";
 import { Amount } from "@/components/ui/money";
 import { TransactionRow } from "@/components/transactions/transaction-row";
-import { SwipeActions } from "@/components/ui/swipe-actions";
 import { deleteTransaction } from "@/lib/data/actions";
 import { EditTransactionModal } from "@/components/transactions/edit-transaction-modal";
 import { dayLabel } from "@/lib/domain/dates";
 import type { Transaction } from "@/lib/domain/types";
+import { DeleteSwipe } from "@/components/ui/delete-swipe";
 
 export function AccountTransactions({ groups }: { groups: { date: string; total: number; items: Transaction[] }[] }) {
   const { categoryById, accountById } = useAppData();
@@ -26,7 +26,7 @@ export function AccountTransactions({ groups }: { groups: { date: string; total:
           <ul className="pt-list-inset overflow-hidden rounded-lg bg-bg-grouped-secondary shadow-card">
             {g.items.map((t) => (
               <li key={t.id}>
-                <SwipeActions
+                <DeleteSwipe
                   label={`Supprimer ${t.place || "la transaction"}`}
                   successMessage={t.type === "transfer" ? "Virement supprimé" : "Transaction supprimée"}
                   onDelete={() => deleteTransaction(t.id)}
@@ -40,7 +40,7 @@ export function AccountTransactions({ groups }: { groups: { date: string; total:
                     counterpart={t.counterpartAccountId ? accountById.get(t.counterpartAccountId) : undefined}
                     onClick={() => setEditing(t)}
                   />
-                </SwipeActions>
+                </DeleteSwipe>
               </li>
             ))}
           </ul>

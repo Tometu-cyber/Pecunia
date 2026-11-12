@@ -7,8 +7,9 @@ import { centsToInput, parseAmountToCents, sanitizeAmountInput } from "@/lib/dom
 import { todayIso } from "@/lib/domain/dates";
 import type { Recurrence, RecurrenceFrequency } from "@/lib/domain/types";
 import { useAppData } from "@/components/app/app-data";
-import { Modal, useToast } from "@/components/ui/overlay";
 import { Button, FieldError, Input, Label, Segmented, Select } from "@/components/ui/primitives";
+import { Modal } from "@portail/ui";
+import { useToast } from "@/components/ui/toasts";
 
 type Draft = Omit<RecurrenceInput, "dueDay"> & { dueDay: string };
 

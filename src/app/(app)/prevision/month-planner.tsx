@@ -9,8 +9,9 @@ import { formatCents, parseAmountToCents, sanitizeAmountInput } from "@/lib/doma
 import { shortAccountName } from "@/lib/domain/accounts";
 import { useAppData } from "@/components/app/app-data";
 import { Amount } from "@/components/ui/money";
-import { Modal, useToast } from "@/components/ui/overlay";
 import { Button, Card, CardHeader, FieldError, Input, Label, Segmented, Select } from "@/components/ui/primitives";
+import { Modal } from "@portail/ui";
+import { useToast } from "@/components/ui/toasts";
 
 export interface PlanLine {
   key: string;

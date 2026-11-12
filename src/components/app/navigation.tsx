@@ -19,15 +19,12 @@ import {
 import { signOut } from "@/lib/data/actions";
 import { formatCents } from "@/lib/domain/money";
 import { APP_NAME, versionLabel } from "@/lib/version";
-import { Modal } from "@/components/ui/overlay";
-import { AppIcon } from "@/components/ui/app-icon";
-import { PECUNIA_APP } from "@/components/ui/ds";
-import type { MenuItem } from "@/components/ui/menu";
-import { Sidebar as DsSidebar } from "@/components/ui/sidebar";
-import { TabBar } from "@/components/ui/tab-bar";
 import { useAppData } from "./app-data";
 import { QuickEntryForm } from "@/components/entry/quick-entry-form";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { Modal, AppIcon, Sidebar as DsSidebar, TabBar } from "@portail/ui";
+import type { MenuItem } from "@portail/ui";
+import { PECUNIA_APP } from "@/components/ui/app";
 
 interface NavItem {
   href: string;

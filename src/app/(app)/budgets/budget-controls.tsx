@@ -1,14 +1,13 @@
 "use client";
 
-import { Toggle } from "@/components/ui/toggle";
 import { clsx } from "clsx";
 import { useState, useTransition, type ReactNode } from "react";
 import { saveBudget, updateProfile } from "@/lib/data/actions";
 import { centsToInput, formatCents, parseAmountToCents, sanitizeAmountInput } from "@/lib/domain/money";
 import type { BudgetMode } from "@/lib/domain/types";
-import { Modal, useToast } from "@/components/ui/overlay";
 import { Button, FieldError, Input, Label, Segmented } from "@/components/ui/primitives";
-import { Spinner } from "@/components/ui/spinner";
+import { Toggle, Modal, Spinner } from "@portail/ui";
+import { useToast } from "@/components/ui/toasts";
 
 /** Ligne cliquable ouvrant l'édition du budget d'une catégorie (montant fixe ou % du revenu). */
 export function BudgetEditButton({

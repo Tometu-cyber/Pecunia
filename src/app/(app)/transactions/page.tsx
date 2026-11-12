@@ -3,9 +3,10 @@ import { getAccounts, getTransactions } from "@/lib/data/queries";
 import { resolveMonth, withStartDay } from "@/lib/data/views";
 import { monthPeriod } from "@/lib/domain/dates";
 import { MonthSwitcher } from "@/components/app/filters";
-import { GlassButton } from "@/components/ui/glass-button";
 import { PageHeader } from "@/components/ui/primitives";
 import { TransactionsView } from "./transactions-view";
+import { GlassButton } from "@portail/ui";
+import Link from "next/link";
 
 export const metadata = { title: "Transactions" };
 
@@ -34,15 +35,15 @@ export default async function TransactionsPage({
         title="Transactions"
         actions={
           <>
-            <GlassButton size="small" icon={Upload} href={importHref}>
+            <GlassButton size="small" icon={Upload} linkAs={Link} href={importHref}>
               Importer un CSV
             </GlassButton>
-            <GlassButton size="small" icon={Plus} prominent href="/saisie">
+            <GlassButton size="small" icon={Plus} prominent linkAs={Link} href="/saisie">
               Nouvelle saisie
             </GlassButton>
           </>
         }
-        mobileActions={<GlassButton icon={Upload} label="Importer un CSV" href={importHref} />}
+        mobileActions={<GlassButton icon={Upload} label="Importer un CSV" linkAs={Link} href={importHref} />}
       />
       <MonthSwitcher path="/transactions" month={month} current={current} params={{ compte: initialAccount }} />
       <TransactionsView key={month} transactions={txs} initialAccount={initialAccount} />

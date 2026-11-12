@@ -6,7 +6,6 @@ import { CircleCheck, FileUp, Plus, TriangleAlert } from "lucide-react";
 import { useCallback, useMemo, useRef, useState, useTransition } from "react";
 import { useAppData } from "@/components/app/app-data";
 import { Banner, Button, Card, Chip, Label, Select, buttonClass, inputClass } from "@/components/ui/primitives";
-import { useToast } from "@/components/ui/overlay";
 import { getLinesInRange, importTransactions } from "@/lib/data/import-actions";
 import {
   COLUMN_ROLE_LABELS,
@@ -34,7 +33,8 @@ import { numericDate, todayIso } from "@/lib/domain/dates";
 import { formatCents } from "@/lib/domain/money";
 import type { Account } from "@/lib/domain/types";
 import { ImportRowView, type RowActions } from "./import-row";
-import { Spinner } from "@/components/ui/spinner";
+import { Spinner } from "@portail/ui";
+import { useToast } from "@/components/ui/toasts";
 
 type Filter = "all" | "review" | "transfers" | "existing" | "excluded";
 

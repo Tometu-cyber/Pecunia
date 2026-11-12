@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { AppVersion } from "@/components/app/app-version";
-import { AppIcon } from "@/components/ui/app-icon";
-import { PECUNIA_APP } from "@/components/ui/ds";
+import { AppIcon } from "@portail/ui";
+import { PECUNIA_APP } from "@/components/ui/app";
 
 /**
  * Mise en page des écrans d'authentification (design system) : icône de l'app, nom et

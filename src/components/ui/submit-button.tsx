@@ -2,7 +2,7 @@
 
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { useFormStatus } from "react-dom";
-import { Spinner } from "./spinner";
+import { Spinner } from "@portail/ui";
 
 /** Bouton d'envoi d'un <form action={…}> : spinner et désactivation pendant l'envoi. */
 export function SubmitButton({

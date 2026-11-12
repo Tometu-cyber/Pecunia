@@ -9,9 +9,9 @@ import type { Category } from "@/lib/domain/types";
 import { useAppData } from "@/components/app/app-data";
 import { IconColorPicker } from "@/components/accounts/account-dialogs";
 import { IconBadge } from "@/components/ui/icons";
-import { Modal, useToast } from "@/components/ui/overlay";
-import { Spinner } from "@/components/ui/spinner";
 import { Button, Card, FieldError, Input, Label } from "@/components/ui/primitives";
+import { Modal, Spinner } from "@portail/ui";
+import { useToast } from "@/components/ui/toasts";
 
 interface Draft {
   id: string | null;

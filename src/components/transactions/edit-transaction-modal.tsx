@@ -6,8 +6,9 @@ import { centsToInput, parseAmountToCents, sanitizeAmountInput } from "@/lib/dom
 import { needsNature, type EntryInput, type EntryKind } from "@/lib/domain/entries";
 import type { Transaction } from "@/lib/domain/types";
 import { useAppData } from "@/components/app/app-data";
-import { Modal, useToast } from "@/components/ui/overlay";
 import { Button, FieldError, Input, Label, Segmented, Select } from "@/components/ui/primitives";
+import { Modal } from "@portail/ui";
+import { useToast } from "@/components/ui/toasts";
 
 /** Reconstruit le formulaire à partir d'une ligne (pour un virement : depuis la ligne source). */
 function toInput(tx: Transaction, all: Transaction[]): EntryInput {

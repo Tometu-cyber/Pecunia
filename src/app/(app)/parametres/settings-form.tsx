@@ -7,11 +7,10 @@ import { signOut, updateProfile } from "@/lib/data/actions";
 import { deleteMyAccount } from "@/lib/data/planning-actions";
 import type { Profile } from "@/lib/domain/types";
 import { Button, Card, FieldError, Input, Label, Segmented, Select, buttonClass } from "@/components/ui/primitives";
-import { Modal } from "@/components/ui/overlay";
-import { useToast } from "@/components/ui/overlay";
-import { Spinner } from "@/components/ui/spinner";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { APP_NAME, copyrightLine, versionLabel } from "@/lib/version";
+import { Modal, Spinner } from "@portail/ui";
+import { useToast } from "@/components/ui/toasts";
 
 function Row({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (

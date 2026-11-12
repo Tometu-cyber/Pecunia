@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { THEME_COOKIE } from "@/lib/theme";
 import { NavigationProgress } from "@/components/ui/navigation-progress";
+import { PortailLinks } from "@/components/app/portail-links";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,10 +24,13 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const theme = (await cookies()).get(THEME_COOKIE)?.value === "dark" ? "dark" : "light";
+  // Sombre par défaut (pas de cookie = première visite) ; seul « clair » choisi explicitement l'emporte
+  const theme = (await cookies()).get(THEME_COOKIE)?.value === "light" ? "light" : "dark";
   return (
     <html lang="fr" data-theme={theme}>
-      <body className="min-h-dvh">
+      {/* pt-app-finances : couleur d'accent de Pecunia, aussi pour Modal et Select rendus à la racine */}
+      <body className="pt-app-finances min-h-dvh">
+        <PortailLinks />
         <Suspense fallback={null}>
           <NavigationProgress />
         </Suspense>
